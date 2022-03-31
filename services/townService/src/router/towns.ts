@@ -144,9 +144,9 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   
     const urlParams: string = new URLSearchParams({
       response_type: 'code',
-      client_id: clientID, // todo pull from env
+      client_id: clientID,
       scope: scope,
-      redirect_uri: redirectURI, //todo pull from env
+      redirect_uri: redirectURI,
       // state: state
     }).toString();
     
@@ -185,7 +185,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
           'Authorization': 'Basic ' + (Buffer.from(clientID + ':' + clientSecret).toString('base64'))
         },
         json: true
-      } 
+      };
       // todo we want to send this in a post request? we should make a call to a lib controller to a file in /client which uses
       // axios to make the post request to spotify
     }
