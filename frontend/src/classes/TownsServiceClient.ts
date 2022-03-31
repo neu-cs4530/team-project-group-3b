@@ -113,6 +113,7 @@ export default class TownsServiceClient {
     const baseURL = serviceURL || process.env.REACT_APP_TOWNS_SERVICE_URL;
     assert(baseURL);
     this._axios = axios.create({ baseURL });
+    this.requestSpotifyAuthorizationFlow = this.requestSpotifyAuthorizationFlow.bind(this);
   }
 
   static unwrapOrThrowError<T>(response: AxiosResponse<ResponseEnvelope<T>>, ignoreResponse = false): T {
@@ -157,6 +158,7 @@ export default class TownsServiceClient {
   }
 
   async requestSpotifyAuthorizationFlow() : Promise<void>{
+    console.log('request spotify authorization flow');
     const responseWrapper = await this._axios.get(`/spotify/login`);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
