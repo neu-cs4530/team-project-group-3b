@@ -171,7 +171,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
 
     const spotifyUrl = 'https://accounts.spotify.com/api/token';
 
-    const urlParams: string = new URLSearchParams({
+    const data: string = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
       redirect_uri: redirectURI,
@@ -183,7 +183,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     };
 
     try {
-      const tokenRequestResponse = await axios.post(`${spotifyUrl}?${urlParams}`, {}, { headers });
+      const tokenRequestResponse = await axios.post(spotifyUrl, { data }, { headers });
     } catch (e) {
       console.log(e);
     }
