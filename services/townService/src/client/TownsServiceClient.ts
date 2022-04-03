@@ -179,7 +179,7 @@ export default class TownsServiceClient {
   }
 
   async requestSpotifyAuthorizationFlow() : Promise<void>{
-    const responseWrapper = await this._axios.get(`/spotify/login`);
+    const responseWrapper = await this._axios.get('/spotify/login');
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
