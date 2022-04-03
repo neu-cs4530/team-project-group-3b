@@ -131,15 +131,16 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
 
   app.get('/spotify/login', (_req, res) => {
     // const state = generateRandomString(16); // todo technically optional but recommended, removed for now
-    const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile';
-    
+    // const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile';
+    const scope = 'user-read-email';
+
     assert(process.env.SPOTIFY_CLIENT_ID,
       'Environmental variable SPOTIFY_CLIENT_ID must be set');
     assert(process.env.SPOTIFY_REDIRECT_URI,
       'Environmental variable SPOTIFY_REDIRECT_URI must be set');
 
     const clientID = process.env.SPOTIFY_CLIENT_ID;
-    const redirectURI = process.env.SPOTIFY_CLIENT_ID;
+    const redirectURI = process.env.SPOTIFY_REDIRECT_URI;
   
     const urlParams: string = new URLSearchParams({
       response_type: 'code',
