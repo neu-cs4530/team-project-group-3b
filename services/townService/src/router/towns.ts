@@ -184,11 +184,17 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
 
     try {
       const tokenRequestResponse = await axios.post(spotifyUrl, data, { headers });
-      console.log("called spotify api token");
-      console.log(tokenRequestResponse);
-      res.end();
-    } catch (e) {
-      console.log(e);
+      
+      const result = {};
+      res.status(StatusCodes.OK)
+        .json(result);
+      // todo better error handling for request
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({
+          message: 'Internal server error, please see log in server for more details',
+        });
     }
   });
 

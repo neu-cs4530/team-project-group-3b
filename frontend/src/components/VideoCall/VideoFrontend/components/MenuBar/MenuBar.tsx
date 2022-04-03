@@ -13,6 +13,7 @@ import ToggleChatButton from '../Buttons/ToggleChatButton/ToggleChatButton';
 import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import TownSettings from '../../../../Login/TownSettings';
+import SpotifyButton from '../../../../Spotify/SpotifyButton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -89,6 +90,7 @@ export default function MenuBar() {
               <Hidden smDown>
                 <Menu />
                 <TownSettings />
+                <SpotifyButton />
               </Hidden>
             </Grid>
           </Grid>
