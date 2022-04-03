@@ -171,11 +171,11 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
 
     const spotifyUrl = 'https://accounts.spotify.com/api/token';
 
-    const data: string = new URLSearchParams({
+    const data = {
       grant_type: 'authorization_code',
       code,
       redirect_uri: redirectURI,
-    }).toString();
+    };
 
     const headers = {
       'Authorization': `Basic ${Buffer.from(`${clientID}:${clientSecret}`).toString('base64')}`,
