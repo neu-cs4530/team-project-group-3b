@@ -179,7 +179,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
 
     const headers = {
       'Authorization': `Basic ${Buffer.from(`${clientID}:${clientSecret}`).toString('base64')}`,
-      // 'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/x-www-form-urlencoded',
     };
 
     try {
