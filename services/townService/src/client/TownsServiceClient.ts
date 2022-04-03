@@ -178,13 +178,11 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async requestSpotifyAuthorizationFlow() : Promise<void>{
-    const responseWrapper = await this._axios.get('/spotify/login');
-    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  async requestSpotifyAuthorizationFlow() : Promise<AxiosResponse>{
+    return this._axios.get('/spotify/login');
   }
 
-  // async requestSpotifyAuthenticationToken() : Promise<void>{
-  //   const responseWrapper = await this._axios.post(`/towns/${requestData.coveyTownID}/conversationAreas`, requestData);
-  //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  // }
+  async requestNewSpotifyAuthenticationToken() : Promise<AxiosResponse>{
+    return this._axios.get('/spotify/token');
+  }
 }

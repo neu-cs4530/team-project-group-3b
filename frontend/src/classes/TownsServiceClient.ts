@@ -158,15 +158,6 @@ export default class TownsServiceClient {
   }
 
   async requestSpotifyAuthorizationFlow() : Promise<AxiosResponse>{
-    // console.log("Called spotify auth flow function");
     return this._axios.get(`/spotify/login`);
-    // const responseWrapper = await this._axios.get(`/spotify/login`);
-    // return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
-
-  // async requestSpotifyAuthenticationToken() : Promise<void>{
-  //   const responseWrapper = await this._axios.post(`/towns/${requestData.coveyTownID}/conversationAreas`, requestData);
-  //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  // }
-
 }
