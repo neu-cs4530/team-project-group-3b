@@ -182,7 +182,11 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
 
-    const tokenRequestResponse = await axios.post(`${spotifyUrl}?${urlParams}`, {}, { headers });
+    try {
+      const tokenRequestResponse = await axios.post(`${spotifyUrl}?${urlParams}`, {}, { headers });
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   const socketServer = new io.Server(http, { cors: { origin: '*' } });
