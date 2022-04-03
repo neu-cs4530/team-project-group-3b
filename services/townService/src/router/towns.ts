@@ -154,7 +154,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     // TODO error handling maybe?
   });
 
-  app.get('/spotify/callback', async (req) => {
+  app.get('/spotify/callback', async (req, res) => {
 
     const code: string = req.query.code as string;
 
@@ -184,6 +184,9 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
 
     try {
       const tokenRequestResponse = await axios.post(spotifyUrl, data, { headers });
+      console.log("called spotify api token");
+      console.log(tokenRequestResponse);
+      res.end();
     } catch (e) {
       console.log(e);
     }
