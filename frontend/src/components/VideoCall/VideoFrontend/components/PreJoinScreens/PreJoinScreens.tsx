@@ -9,6 +9,7 @@ import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import { TownJoinResponse } from '../../../../../classes/TownsServiceClient';
 import { Heading, Text } from '@chakra-ui/react';
 import TownSelection from '../../../../Login/TownSelection';
+import SpotifyButton from '../../../../Spotify/SpotifyButton';
 
 export enum Steps {
   roomNameStep,
@@ -43,6 +44,7 @@ export default function PreJoinScreens(props: { doLogin: (initData: TownJoinResp
         to hang out in, or join an existing one.
       </Text>
         <DeviceSelectionScreen />
+        <SpotifyButton />
         <TownSelection doLogin={props.doLogin} />
     </IntroContainer>
   );
