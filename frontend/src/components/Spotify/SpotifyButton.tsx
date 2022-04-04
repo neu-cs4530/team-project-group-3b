@@ -32,31 +32,46 @@ function spotifyFlow() {
   // TODO error handling maybe?
 }
 
+function discardExpiredAccessToken() {
+  const now = new Date();
+
+  // remove session token from local storage for spotify if past expiry
+  const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
+
+  if(localStorageToken != null) {
+    // console.log(now.getTime());
+    // console.log(parseInt(JSON.parse(localStorageToken).expiry, 10));
+    const expired = now.getTime() > parseInt(JSON.parse(localStorageToken).expiry, 10);
+    if(expired) {
+      window.localStorage.removeItem("SpotifyAccessToken");
+    }
+  }
+}
+
 export default function SpotifyButton(): JSX.Element {
   // const { apiClient } = useCoveyAppState();
   const now = new Date();
   
   // add new access token to local storage if on the end of a callback, based on given url params
   const url = useLocation();
+  console.log(url);
   const hashFragmentParams = new URLSearchParams(url.hash.substring(1));
   const spotifyAccessToken = hashFragmentParams.get("access_token");
   const spotifyExpiresIn = hashFragmentParams.get("expires_in");
 
   if(spotifyAccessToken != null && spotifyExpiresIn != null) {
+    console.log('token found in url!');
     const fullToken = {"access_token": spotifyAccessToken, "expiry": now.getTime() + (parseInt(spotifyExpiresIn, 10) * 1000)};
     window.localStorage.setItem("SpotifyAccessToken", JSON.stringify(fullToken));
-  }
 
-  // remove session token from local storage for spotify if past expiry
-  const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
-
-  if(localStorageToken != null) {
-    console.log(now.getTime());
-    console.log(parseInt(JSON.parse(localStorageToken).expiry, 10));
-    const expired = now.getTime() > parseInt(JSON.parse(localStorageToken).expiry, 10);
-    if(expired) {
-      window.localStorage.removeItem("SpotifyAccessToken");
+    const baseURL = process.env.REACT_APP_BASE_URL;
+    console.log(baseURL);
+    if (baseURL) {
+      console.log('to home page')
+      window.location.replace(baseURL);
     }
+  } else {
+    discardExpiredAccessToken();
   }
 
   return (
