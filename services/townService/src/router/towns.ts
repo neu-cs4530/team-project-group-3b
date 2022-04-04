@@ -129,7 +129,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
-  app.get('/spotify/login', (_req, res) => {
+  app.get('/spotify/login', (_req) => {
     // const state = generateRandomString(16); // todo technically optional but recommended, removed for now
     // const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile';
     const scope = 'user-read-email';
@@ -149,8 +149,9 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       redirect_uri: redirectURI,
       // state: state
     }).toString();
-    
-    res.redirect(`https://accounts.spotify.com/authorize?${urlParams}`);
+
+    axios.get(`https://accounts.spotify.com/authorize?${urlParams}`)
+    // res.redirect(`https://accounts.spotify.com/authorize?${urlParams}`);
     // TODO error handling maybe?
   });
 
