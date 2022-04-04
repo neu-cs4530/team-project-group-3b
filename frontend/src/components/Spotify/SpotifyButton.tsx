@@ -8,7 +8,7 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 function spotifyFlow() {
   // const state = generateRandomString(16); // todo technically optional but recommended, removed for now
-  // const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile';
+  // const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile user-read-email';
   const scope = 'user-read-email';
 
   console.log(process.env);
@@ -40,7 +40,8 @@ export default function SpotifyButton(): JSX.Element {
   const spotifyAccessToken = hashFragmentParams.get("access_token");
 
   if(spotifyAccessToken != null) {
-    window.localStorage.setItem("spotifyAccessToken", spotifyAccessToken);
+    const fullToken = {"access_token": spotifyAccessToken}
+    window.localStorage.setItem("SpotifyAccessToken", spotifyAccessToken);
   }
 
   return (
