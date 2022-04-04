@@ -1,6 +1,7 @@
 import React from 'react';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import assert from 'assert';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
@@ -28,14 +29,20 @@ function spotifyFlow() {
   }).toString();
   
   window.location.replace(`https://accounts.spotify.com/authorize?${urlParams}`);
-  // axios.get(`https://accounts.spotify.com/authorize?${urlParams}`);
-  // res.redirect(`https://accounts.spotify.com/authorize?${urlParams}`);
   // TODO error handling maybe?
 }
 
 export default function SpotifyButton(): JSX.Element {
-  const { apiClient } = useCoveyAppState();
+  // const { apiClient } = useCoveyAppState();
   
+  const url = useLocation();
+  const hashFragmentParams = new URLSearchParams(url.hash.substring(1));
+  const spotifyAccessToken = hashFragmentParams.get("access_token");
+
+  if(spotifyAccessToken != null) {
+    window.localStorage.setItem("spotifyAccessToken", spotifyAccessToken);
+  }
+
   return (
     <MenuItem onClick={spotifyFlow}>
       <Typography variant="body1">Login with Spotify</Typography>
