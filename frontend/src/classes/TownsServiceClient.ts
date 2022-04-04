@@ -11,6 +11,8 @@ export interface TownJoinRequest {
   userName: string;
   /** ID of the town that the player would like to join * */
   coveyTownID: string;
+  /** Spotify session token of the player that would like to join */
+  spotifySessionToken?: string;
 }
 
 /**

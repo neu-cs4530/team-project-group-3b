@@ -44,18 +44,18 @@ export default function SpotifyButton(): JSX.Element {
 
   if(spotifyAccessToken != null && spotifyExpiresIn != null) {
     const fullToken = {"access_token": spotifyAccessToken, "expiry": now.getTime() + (parseInt(spotifyExpiresIn, 10) * 1000)};
-    window.localStorage.setItem("SpotifyAccessToken", JSON.stringify(fullToken));
+    window.localStorage.setItem("CoveyTownSpotifyAccessToken", JSON.stringify(fullToken));
   }
 
   // remove session token from local storage for spotify if past expiry
-  const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
+  const localStorageToken = window.localStorage.getItem("CoveyTownSpotifyAccessToken");
 
   if(localStorageToken != null) {
     console.log(now.getTime());
     console.log(parseInt(JSON.parse(localStorageToken).expiry, 10));
     const expired = now.getTime() > parseInt(JSON.parse(localStorageToken).expiry, 10);
     if(expired) {
-      window.localStorage.removeItem("SpotifyAccessToken");
+      window.localStorage.removeItem("CoveyTownSpotifyAccessToken");
     }
   }
 
