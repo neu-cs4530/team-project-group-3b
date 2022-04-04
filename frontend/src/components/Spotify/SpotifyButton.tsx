@@ -34,14 +34,29 @@ function spotifyFlow() {
 
 export default function SpotifyButton(): JSX.Element {
   // const { apiClient } = useCoveyAppState();
+  const now = new Date();
   
+  // add new access token to local storage if on the end of a callback, based on given url params
   const url = useLocation();
   const hashFragmentParams = new URLSearchParams(url.hash.substring(1));
   const spotifyAccessToken = hashFragmentParams.get("access_token");
+  const spotifyExpiresIn = hashFragmentParams.get("expires_in");
 
-  if(spotifyAccessToken != null) {
-    const fullToken = {"access_token": spotifyAccessToken}
-    window.localStorage.setItem("SpotifyAccessToken", spotifyAccessToken);
+  if(spotifyAccessToken != null && spotifyExpiresIn != null) {
+    const fullToken = {"access_token": spotifyAccessToken, "expiry": now.getTime() + (parseInt(spotifyExpiresIn, 10) * 1000)};
+    window.localStorage.setItem("SpotifyAccessToken", JSON.stringify(fullToken));
+  }
+
+  // remove session token from local storage for spotify if past expiry
+  const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
+
+  if(localStorageToken != null) {
+    console.log(now.getTime());
+    console.log(parseInt(JSON.parse(localStorageToken).expiry, 10));
+    const expired = now.getTime() > parseInt(JSON.parse(localStorageToken).expiry, 10);
+    if(expired) {
+      window.localStorage.removeItem("SpotifyAccessToken");
+    }
   }
 
   return (
