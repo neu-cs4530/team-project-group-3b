@@ -2,16 +2,16 @@ import React from 'react';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios';
 import assert from 'assert';
-import useCoveyAppState from '../../hooks/useCoveyAppState';
+// import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 function spotifyFlow() {
   // const state = generateRandomString(16); // todo technically optional but recommended, removed for now
   // const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile user-read-email';
   const scope = 'user-read-email';
 
-  console.log(process.env);
+  // console.log(process.env);
 
   assert(process.env.REACT_APP_SPOTIFY_CLIENT_ID,
     'Environmental variable SPOTIFY_CLIENT_ID must be set');
@@ -54,21 +54,17 @@ export default function SpotifyButton(): JSX.Element {
   
   // add new access token to local storage if on the end of a callback, based on given url params
   const url = useLocation();
-  console.log(url);
   const hashFragmentParams = new URLSearchParams(url.hash.substring(1));
   const spotifyAccessToken = hashFragmentParams.get("access_token");
   const spotifyExpiresIn = hashFragmentParams.get("expires_in");
 
   if(spotifyAccessToken != null && spotifyExpiresIn != null) {
-    console.log('token found in url!');
     const fullToken = {"access_token": spotifyAccessToken, "expiry": now.getTime() + (parseInt(spotifyExpiresIn, 10) * 1000)};
 
     window.localStorage.setItem("SpotifyAccessToken", JSON.stringify(fullToken));
 
     const baseURL = process.env.REACT_APP_BASE_URL;
-    console.log(baseURL);
     if (baseURL) {
-      console.log('to home page')
       window.location.replace(baseURL);
     }
   } else {
