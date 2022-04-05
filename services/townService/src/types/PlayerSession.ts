@@ -15,10 +15,21 @@ export default class PlayerSession {
   /** The secret token that allows this client to access our video resources for this town * */
   private _videoToken?: string;
 
+  /** The access token for this player in regards to spotify * */
+  private _spotifyToken?: string;
+
   constructor(player: Player) {
     this._player = player;
     // Session tokens are randomly generated strings
     this._sessionToken = nanoid();
+  }
+
+  set spotifyToken(value: string | undefined) {
+    this._spotifyToken = value;
+  }
+
+  get spotifyToken(): string | undefined {
+    return this._spotifyToken;
   }
 
   set videoToken(value: string | undefined) {

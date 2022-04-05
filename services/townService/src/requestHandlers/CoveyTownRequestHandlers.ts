@@ -14,6 +14,8 @@ export interface TownJoinRequest {
   userName: string;
   /** ID of the town that the player would like to join * */
   coveyTownID: string;
+  /** Spotify session token of the player that would like to join */
+  spotifySessionToken?: string;
 }
 
 /**
@@ -111,6 +113,11 @@ export async function townJoinHandler(requestData: TownJoinRequest): Promise<Res
   }
   const newPlayer = new Player(requestData.userName);
   const newSession = await coveyTownController.addPlayer(newPlayer);
+  
+  if(requestData.spotifySessionToken != null) {
+    newSession.spotifyToken = requestData.spotifySessionToken;
+  }
+
   assert(newSession.videoToken);
   return {
     isOK: true,

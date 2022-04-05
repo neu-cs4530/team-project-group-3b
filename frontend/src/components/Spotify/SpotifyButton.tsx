@@ -62,6 +62,7 @@ export default function SpotifyButton(): JSX.Element {
   if(spotifyAccessToken != null && spotifyExpiresIn != null) {
     console.log('token found in url!');
     const fullToken = {"access_token": spotifyAccessToken, "expiry": now.getTime() + (parseInt(spotifyExpiresIn, 10) * 1000)};
+
     window.localStorage.setItem("SpotifyAccessToken", JSON.stringify(fullToken));
 
     const baseURL = process.env.REACT_APP_BASE_URL;
