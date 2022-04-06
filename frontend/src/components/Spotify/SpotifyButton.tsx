@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import { useLocation } from 'react-router-dom';
 // import axios from 'axios';
 import assert from 'assert';
+import { Button } from '@chakra-ui/react';
 // import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 function spotifyFlow() {
@@ -72,8 +73,8 @@ export default function SpotifyButton(): JSX.Element {
   }
 
   return (
-    <MenuItem onClick={spotifyFlow}>
-      <Typography variant="body1">Login with Spotify</Typography>
-    </MenuItem>
+      <Button onClick={spotifyFlow}>
+        <Typography variant="body1">Login with Spotify</Typography>
+      </Button>
   );
 }
