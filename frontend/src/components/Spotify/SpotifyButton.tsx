@@ -33,20 +33,15 @@ function spotifyFlow() {
   // TODO error handling maybe?
 }
 
-function discardExpiredAccessToken() {
+function isTokenExpired() {
   const now = new Date();
-
-  // remove session token from local storage for spotify if past expiry
   const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
+  assert(localStorageToken);
+  
+  const timeNow = now.getTime();
+  const timeExpiry = parseInt(JSON.parse(localStorageToken).expiry, 10);
 
-  if(localStorageToken != null) {
-    // console.log(now.getTime());
-    // console.log(parseInt(JSON.parse(localStorageToken).expiry, 10));
-    const expired = now.getTime() > parseInt(JSON.parse(localStorageToken).expiry, 10);
-    if(expired) {
-      window.localStorage.removeItem("SpotifyAccessToken");
-    }
-  }
+  return timeNow > timeExpiry;
 }
 
 export default function SpotifyButton(): JSX.Element {
@@ -59,7 +54,18 @@ export default function SpotifyButton(): JSX.Element {
   const spotifyAccessToken = hashFragmentParams.get("access_token");
   const spotifyExpiresIn = hashFragmentParams.get("expires_in");
 
-  if(spotifyAccessToken != null && spotifyExpiresIn != null) {
+  const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
+  let callAuthFlow = false;
+
+  if (localStorageToken) {
+    // if expired, discard it
+    if (isTokenExpired()) {
+      window.localStorage.removeItem("SpotifyAccessToken");
+      // flow should happen
+      callAuthFlow = true;
+    }
+  // if no token, is one available in the url?
+  } else if (spotifyAccessToken != null && spotifyExpiresIn != null) {
     const fullToken = {"access_token": spotifyAccessToken, "expiry": now.getTime() + (parseInt(spotifyExpiresIn, 10) * 1000)};
 
     window.localStorage.setItem("SpotifyAccessToken", JSON.stringify(fullToken));
@@ -69,11 +75,12 @@ export default function SpotifyButton(): JSX.Element {
       window.location.replace(baseURL);
     }
   } else {
-    discardExpiredAccessToken();
+    // flow should happen
+    callAuthFlow = true;
   }
 
   return (
-      <Button onClick={spotifyFlow}>
+      <Button onClick={callAuthFlow ? spotifyFlow : () => { console.log('SpotifyButton: Token is live.') }}>
         <Typography variant="body1">Login with Spotify</Typography>
       </Button>
   );
