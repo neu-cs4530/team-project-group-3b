@@ -57,21 +57,43 @@ export default class Video {
   private async setup(): Promise<TownJoinResponse> {
     if (!this.initialisePromise) {
       this.initialisePromise = new Promise((resolve, reject) => {
-        // Request our token to join the town
-        this.townsServiceClient.joinTown({
-          coveyTownID: this._coveyTownID,
-          userName: this._userName,
-        })
-          .then((result) => {
-            this.sessionToken = result.coveySessionToken;
-            this.videoToken = result.providerVideoToken;
-            this._townFriendlyName = result.friendlyName;
-            this._isPubliclyListed = result.isPubliclyListed;
-            resolve(result);
+        const localStorageToken = window.localStorage.getItem("CoveyTownSpotifyAccessToken");
+
+        if(localStorageToken != null) {
+          // Request our token to join the town with spotifyaccesstoken since it exists
+          this.townsServiceClient.joinTown({
+            coveyTownID: this._coveyTownID,
+            userName: this._userName,
+            spotifySessionToken: localStorageToken,
           })
-          .catch((err) => {
-            reject(err);
-          });
+            .then((result) => {
+              this.sessionToken = result.coveySessionToken;
+              this.videoToken = result.providerVideoToken;
+              this._townFriendlyName = result.friendlyName;
+              this._isPubliclyListed = result.isPubliclyListed;
+              resolve(result);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        }
+        else {
+          // Request our token to join the town
+          this.townsServiceClient.joinTown({
+            coveyTownID: this._coveyTownID,
+            userName: this._userName,
+          })
+            .then((result) => {
+              this.sessionToken = result.coveySessionToken;
+              this.videoToken = result.providerVideoToken;
+              this._townFriendlyName = result.friendlyName;
+              this._isPubliclyListed = result.isPubliclyListed;
+              resolve(result);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        }
       });
     }
     return this.initialisePromise;

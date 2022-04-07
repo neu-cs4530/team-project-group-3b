@@ -21,12 +21,22 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.post('/sessions', express.json(), async (req, res) => {
     try {
-      const result = await townJoinHandler({
-        userName: req.body.userName,
-        coveyTownID: req.body.coveyTownID,
-      });
-      res.status(StatusCodes.OK)
-        .json(result);
+      if(req.body.spotifySessionToken != null) {
+        const result = await townJoinHandler({
+          userName: req.body.userName,
+          coveyTownID: req.body.coveyTownID,
+          spotifySessionToken: req.body.spotifySessionToken,
+        });
+        res.status(StatusCodes.OK)
+          .json(result);
+      } else {
+        const result = await townJoinHandler({
+          userName: req.body.userName,
+          coveyTownID: req.body.coveyTownID,
+        });
+        res.status(StatusCodes.OK)
+          .json(result);
+      }
     } catch (err) {
       logError(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR)
