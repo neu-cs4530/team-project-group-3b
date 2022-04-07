@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import { useLocation } from 'react-router-dom';
 // import axios from 'axios';
 import assert from 'assert';
-import { Button } from '@chakra-ui/react';
+import { Button, Tooltip } from '@chakra-ui/react';
 // import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 function spotifyFlow() {
@@ -80,8 +80,10 @@ export default function SpotifyButton(): JSX.Element {
   }
 
   return (
-      <Button onClick={callAuthFlow ? spotifyFlow : () => { console.log('SpotifyButton: Token is live.') }}>
+    <Tooltip label={ callAuthFlow ? 'Click to Connect!' : 'Connected!' } placement='right' shouldWrapChildren>
+      <Button isDisabled={!callAuthFlow} colorScheme={ callAuthFlow ? 'gray' : 'green' } onClick={callAuthFlow ? spotifyFlow : () => { console.log('SpotifyButton: Token is live.') }}>
         <Typography variant="body1">Login with Spotify</Typography>
       </Button>
+    </Tooltip>
   );
 }
