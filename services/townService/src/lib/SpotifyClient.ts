@@ -3,7 +3,7 @@ import assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
 import Player from '../types/Player';
-import ISpotifyClientStatic from './ISpotifyClient';
+// import ISpotifyClientStatic from './ISpotifyClient';
 
 dotenv.config();
 
@@ -14,8 +14,8 @@ declare global {
     code: undefined;
   }
 }
-// ``````````````@staticImplements<ISpotifyClientStatic>()
-export default class SpotifyClient implements ISpotifyClientStatic {
+
+export default class SpotifyClient {
   private static _instance: SpotifyClient;
 
   // maps coveyTownIDs to a map from Players to their spotifyTokens
@@ -56,7 +56,7 @@ export default class SpotifyClient implements ISpotifyClientStatic {
     return SpotifyClient._instance;
   }
 
-  getTokenForTownPlayer(coveyTownID: string, player: Player): string | undefined {
+  static getTokenForTownPlayer(coveyTownID: string, player: Player): string | undefined {
     if (this) {
       const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
@@ -68,7 +68,7 @@ export default class SpotifyClient implements ISpotifyClientStatic {
   private static async getSpotifyAPICallResponse(apiURL: string, 
     coveyTownID: string, 
     player: Player): Promise<AxiosResponse<any> | undefined> {
-    const playerToken = this.getTokenForTownPlayer(coveyTownID, player);
+    const playerToken = SpotifyClient.getTokenForTownPlayer(coveyTownID, player);
 
     try {
       const response = await axios.get(apiURL, { 
