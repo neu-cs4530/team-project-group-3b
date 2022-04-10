@@ -1,3 +1,5 @@
+import Player from '../types/Player';
+
 /**
  * The Spotify listening component of Covey.Town must implement this server interface,
  * which is used to authorize a client to connect to Spotify.
@@ -8,8 +10,10 @@ export default interface ISpotifyClient {
      * to connect to Spotify.
      *
      * @param coveyTownID The town that the client should be able to connect to
-     * @param clientIdentity The identity of the client; Spotify will map a client
+     * @param player The identity of the client; Spotify will map a client
      *                      that connects with the returned token back to this client identifier
      */
-  getTokenForTown(coveyTownID: string, clientIdentity: string): Promise<string>;
+  getTokenForTownPlayer(coveyTownID: string, player: Player): Promise<string | undefined>;
+
+  // need to fix the above comment when we decide on a type for the second argument
 }
