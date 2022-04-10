@@ -138,7 +138,9 @@ export default class SpotifyClient {
 
       const currentTrackTitle = await currentTrackJsonData.item.name;
 
-      return currentTrackTitle;
+      const currentTrackArtist = await currentTrackJsonData.item.album.artists[0].name;
+
+      return `${currentTrackTitle} by ${currentTrackArtist}`;
     }
     
     return undefined;
