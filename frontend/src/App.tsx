@@ -33,7 +33,6 @@ import CoveyAppContext from './contexts/CoveyAppContext';
 import NearbyPlayersContext from './contexts/NearbyPlayersContext';
 import PlayerMovementContext, { PlayerMovementCallback } from './contexts/PlayerMovementContext';
 import PlayersInTownContext from './contexts/PlayersInTownContext';
-import PlayerSpotifySongContext, { PlayerSpotifySongCallback } from './contexts/PlayerSpotifySongContext';
 import VideoContext from './contexts/VideoContext';
 import { CoveyAppState } from './CoveyTypes';
 
@@ -127,7 +126,7 @@ function samePlayers(a1: Player[], a2: Player[]) {
 function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefined>> }) {
   const [appState, dispatchAppUpdate] = useReducer(appStateReducer, defaultAppState());
   const [playerMovementCallbacks] = useState<PlayerMovementCallback[]>([]);
-  const [playerSpotifySongCallbacks] = useState<PlayerSpotifySongCallback[]>([]);
+  // const [playerSpotifySongCallbacks] = useState<PlayerSpotifySongCallback[]>([]);
   const [playersInTown, setPlayersInTown] = useState<Player[]>([]);
   const [nearbyPlayers, setNearbyPlayers] = useState<Player[]>([]);
   // const [currentLocation, setCurrentLocation] = useState<UserLocation>({moving: false, rotation: 'front', x: 0, y: 0});
@@ -207,21 +206,20 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       });
-      socket.on('playerSpotifySongChanged', (player: ServerPlayer) => {
-        if (player._id !== gamePlayerID) {
-          const now = Date.now();
-          playerSpotifySongCallbacks.forEach(cb => cb(player));
-          if (player.song) {
-            const updatePlayer = localPlayers.find(p => p.id === player._id);
-            if (updatePlayer) {
-              updatePlayer.song = player.song;
-            } else {
-              localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
-              setPlayersInTown(localPlayers);
-            }
-          }
-        }
-      });
+      // socket.on('playerSpotifySongChanged', (player: ServerPlayer) => {
+      //   if (player._id !== gamePlayerID) {
+      //     playerSpotifySongCallbacks.forEach(cb => cb(player));
+      //     if (player.song) {
+      //       const updatePlayer = localPlayers.find(p => p.id === player._id);
+      //       if (updatePlayer) {
+      //         updatePlayer.song = player.song;
+      //       } else {
+      //         localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
+      //         setPlayersInTown(localPlayers);
+      //       }
+      //     }
+      //   }
+      // });
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {
         localPlayers = localPlayers.filter(player => player.id !== disconnectedPlayer._id);
         setPlayersInTown(localPlayers);
@@ -271,6 +269,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
     [
       dispatchAppUpdate,
       playerMovementCallbacks,
+      // playerSpotifySongCallbacks,
       setPlayersInTown,
       setNearbyPlayers,
       setConversationAreas,
@@ -310,9 +309,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
             <PlayersInTownContext.Provider value={playersInTown}>
               <NearbyPlayersContext.Provider value={nearbyPlayers}>
                 <ConversationAreasContext.Provider value={conversationAreas}>
-                  <PlayerSpotifySongContext.Provider value={playerSpotifySongCallbacks}>
                     {page}
-                  </PlayerSpotifySongContext.Provider>
                 </ConversationAreasContext.Provider>
               </NearbyPlayersContext.Provider>
             </PlayersInTownContext.Provider>

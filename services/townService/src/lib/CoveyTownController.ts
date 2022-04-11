@@ -93,8 +93,8 @@ export default class CoveyTownController {
         if (currentPlayingSong !== player.spotifySong) {
           player.spotifySong = currentPlayingSong ? currentPlayingSong : '';
 
-          this._listeners?.forEach(listener => listener.onPlayerSpotifySongChanged(player));
         }
+        // this._listeners?.forEach(listener => listener.onPlayerSpotifySongChanged(player));
         
         console.log(player.spotifySong);
       });

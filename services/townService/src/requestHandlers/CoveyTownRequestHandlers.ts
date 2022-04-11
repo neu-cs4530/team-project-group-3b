@@ -222,9 +222,6 @@ export function conversationAreaCreateHandler(_requestData: ConversationAreaCrea
  */
 function townSocketAdapter(socket: Socket): CoveyTownListener {
   return {
-    onPlayerSpotifySongChanged(spotifySongChangedPlayer: Player) {
-      socket.emit('playerSpotifySongChanged', spotifySongChangedPlayer);
-    },
     onPlayerMoved(movedPlayer: Player) {
       socket.emit('playerMoved', movedPlayer);
     },
