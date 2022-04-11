@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import { useLocation } from 'react-router-dom';
 // import axios from 'axios';
 import assert from 'assert';
-import { Button } from '@chakra-ui/react';
+import { Button, Tooltip } from '@chakra-ui/react';
 // import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 function spotifyFlow() {
@@ -35,7 +35,7 @@ function spotifyFlow() {
 
 function isTokenExpired() {
   const now = new Date();
-  const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
+  const localStorageToken = window.localStorage.getItem("CoveyTownSpotifyAccessToken");
   assert(localStorageToken);
   
   const timeNow = now.getTime();
@@ -54,13 +54,13 @@ export default function SpotifyButton(): JSX.Element {
   const spotifyAccessToken = hashFragmentParams.get("access_token");
   const spotifyExpiresIn = hashFragmentParams.get("expires_in");
 
-  const localStorageToken = window.localStorage.getItem("SpotifyAccessToken");
+  const localStorageToken = window.localStorage.getItem("CoveyTownSpotifyAccessToken");
   let callAuthFlow = false;
 
   if (localStorageToken) {
     // if expired, discard it
     if (isTokenExpired()) {
-      window.localStorage.removeItem("SpotifyAccessToken");
+      window.localStorage.removeItem("CoveyTownSpotifyAccessToken");
       // flow should happen
       callAuthFlow = true;
     }
@@ -68,7 +68,7 @@ export default function SpotifyButton(): JSX.Element {
   } else if (spotifyAccessToken != null && spotifyExpiresIn != null) {
     const fullToken = {"access_token": spotifyAccessToken, "expiry": now.getTime() + (parseInt(spotifyExpiresIn, 10) * 1000)};
 
-    window.localStorage.setItem("SpotifyAccessToken", JSON.stringify(fullToken));
+    window.localStorage.setItem("CoveyTownSpotifyAccessToken", JSON.stringify(fullToken));
 
     const baseURL = process.env.REACT_APP_BASE_URL;
     if (baseURL) {
@@ -80,8 +80,10 @@ export default function SpotifyButton(): JSX.Element {
   }
 
   return (
-      <Button onClick={callAuthFlow ? spotifyFlow : () => { console.log('SpotifyButton: Token is live.') }}>
+    <Tooltip label={ callAuthFlow ? 'Click to Connect!' : 'Connected!' } placement='right' shouldWrapChildren>
+      <Button isDisabled={!callAuthFlow} colorScheme={ callAuthFlow ? 'gray' : 'green' } onClick={callAuthFlow ? spotifyFlow : () => { console.log('SpotifyButton: Token is live.') }}>
         <Typography variant="body1">Login with Spotify</Typography>
       </Button>
+    </Tooltip>
   );
 }

@@ -60,7 +60,7 @@ export default class Video {
         const localStorageToken = window.localStorage.getItem("CoveyTownSpotifyAccessToken");
 
         if(localStorageToken != null) {
-          // Request our token to join the town with spotifyaccesstoken since it exists
+          // Request our token to join the town with spotifyaccesstoken if it exists
           this.townsServiceClient.joinTown({
             coveyTownID: this._coveyTownID,
             userName: this._userName,
