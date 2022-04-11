@@ -179,7 +179,7 @@ class CoveyGameScene extends Phaser.Scene {
           y: 0,
         };
       }
-      myPlayer = new Player(player.id, player.userName, location);
+      myPlayer = new Player(player.id, player.userName, location, '');
       this.players.push(myPlayer);
     }
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
@@ -196,7 +196,7 @@ class CoveyGameScene extends Phaser.Scene {
           color: '#000000',
           backgroundColor: '#ffffff',
         });
-        const spotifyLabel = this.add.text(0, 0, myPlayer.userName, {
+        const spotifyLabel = this.add.text(0, 0, '', {
           font: '18px monospace',
           color: '#000000',
           backgroundColor: '#ffffff',

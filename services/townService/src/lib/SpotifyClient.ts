@@ -73,8 +73,7 @@ export default class SpotifyClient {
     try {
       const response = await axios.get(apiURL, { 
         headers: { 
-          // 'Authorization': `Bearer ${playerToken}`,
-          'Authorization': `Bearer BQCeBb5J-j-sWoohiCbEoZqxURvQZ0XPWkl4AOy9TJNLAeRa2DxwATkkftq4Ovo8VEMiwoXfr8l9kuKG_y_XOgQZ73dAg5PFl66z88XppN7eJ0anPvqqbo2N1eo3jGmoBZyOhqnA4-z4Mt2K-ZZc5yEAYuQVHKcRQbysiHbco5lSO4iIdE5j6A`,
+          'Authorization': `Bearer ${playerToken}`,
           'Content-Type': 'application/json',
         },
       });
@@ -137,11 +136,13 @@ export default class SpotifyClient {
     if (currentTrackInfo) {
       const currentTrackJsonData = await currentTrackInfo.data;
 
-      const currentTrackTitle = await currentTrackJsonData.item.name;
+      if (currentTrackJsonData.item) {
+        const currentTrackTitle = await currentTrackJsonData.item.name;
 
-      const currentTrackArtist = await currentTrackJsonData.item.album.artists[0].name;
-
-      return `${currentTrackTitle} by ${currentTrackArtist}`;
+        const currentTrackArtist = await currentTrackJsonData.item.album.artists[0].name;
+        
+        return `${currentTrackTitle} by ${currentTrackArtist}`;
+      }
     }
     
     return undefined;
