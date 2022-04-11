@@ -126,7 +126,6 @@ function samePlayers(a1: Player[], a2: Player[]) {
 function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefined>> }) {
   const [appState, dispatchAppUpdate] = useReducer(appStateReducer, defaultAppState());
   const [playerMovementCallbacks] = useState<PlayerMovementCallback[]>([]);
-  // const [playerSpotifySongCallbacks] = useState<PlayerSpotifySongCallback[]>([]);
   const [playersInTown, setPlayersInTown] = useState<Player[]>([]);
   const [nearbyPlayers, setNearbyPlayers] = useState<Player[]>([]);
   // const [currentLocation, setCurrentLocation] = useState<UserLocation>({moving: false, rotation: 'front', x: 0, y: 0});
@@ -206,20 +205,13 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       });
-      // socket.on('playerSpotifySongChanged', (player: ServerPlayer) => {
-      //   if (player._id !== gamePlayerID) {
-      //     playerSpotifySongCallbacks.forEach(cb => cb(player));
-      //     if (player.song) {
-      //       const updatePlayer = localPlayers.find(p => p.id === player._id);
-      //       if (updatePlayer) {
-      //         updatePlayer.song = player.song;
-      //       } else {
-      //         localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
-      //         setPlayersInTown(localPlayers);
-      //       }
-      //     }
-      //   }
-      // });
+      // todo listen for playerSpotifySongUpdated
+      socket.on('playerSongUpdated', (player: ServerPlayer) => {
+        console.log('playerSongUpdated')
+        const updatePlayer = localPlayers.filter(p => p.id === player._id)[0];
+        updatePlayer.song = player.song;
+        setPlayersInTown(localPlayers);
+      });
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {
         localPlayers = localPlayers.filter(player => player.id !== disconnectedPlayer._id);
         setPlayersInTown(localPlayers);

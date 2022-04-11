@@ -12,6 +12,8 @@ export default interface CoveyTownListener {
    */
   onPlayerJoined(newPlayer: Player): void;
 
+  onPlayerSongUpdated(updatedPlayer: Player): void;
+
   /**
    * Called when a player's location changes
    * @param movedPlayer the player that moved

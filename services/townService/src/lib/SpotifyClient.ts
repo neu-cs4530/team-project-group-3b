@@ -73,8 +73,7 @@ export default class SpotifyClient {
     try {
       const response = await axios.get(apiURL, { 
         headers: { 
-          // 'Authorization': `Bearer ${playerToken}`,
-          'Authorization': `Bearer BQBwjmB7nrE1jPXDT48bbCUvXkBAE4aOYu5vxpEl3CRmYcghuW2vbaKi_Bn8MSpohI5PgIqa8zl16ZIxauPYGsjBT7dabZBeHnWunYD0PA3rSbWRXGiHW8zzomEiqcHwpAA0PHSuBC2AWohjlUifJQcT04EahO89qbU35WL-TroW2tldO-86fQ`,
+          'Authorization': `Bearer ${playerToken}`,
           'Content-Type': 'application/json',
         },
       });

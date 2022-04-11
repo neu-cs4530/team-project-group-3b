@@ -8,7 +8,6 @@ import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
 import usePlayerMovement from '../../hooks/usePlayerMovement';
 import usePlayersInTown from '../../hooks/usePlayersInTown';
-import usePlayerSpotifySong from '../../hooks/usePlayerSpotifySong';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import NewConversationModal from './NewCoversationModal';
 
@@ -183,6 +182,15 @@ class CoveyGameScene extends Phaser.Scene {
 
   updatePlayerLocation(player: Player) {
     let myPlayer = this.players.find(p => p.id === player.id);
+    if (myPlayer) {
+      const label = this.add.text(0, 0, myPlayer.userName + (player.song ? player.song : ''), {
+        font: '18px monospace',
+        color: '#000000',
+        backgroundColor: '#ffffff',
+      });
+      myPlayer.label = label;
+    }
+    
     if (!myPlayer) {
       let { location } = player;
       if (!location) {
@@ -205,7 +213,7 @@ class CoveyGameScene extends Phaser.Scene {
           .sprite(0, 0, 'atlas', 'misa-front')
           .setSize(30, 40)
           .setOffset(0, 24);
-        const label = this.add.text(0, 0, myPlayer.userName, {
+        const label = this.add.text(0, 0, myPlayer.userName + (player.song ? player.song : ''), {
           font: '18px monospace',
           color: '#000000',
           backgroundColor: '#ffffff',
@@ -693,7 +701,6 @@ export default function WorldMap(): JSX.Element {
   const [newConversation, setNewConversation] = useState<ConversationArea>();
   const playerMovementCallbacks = usePlayerMovement();
   const players = usePlayersInTown();
-  const playerSpotifySongCallbacks = usePlayerSpotifySong();
 
   useEffect(() => {
     const config = {
@@ -740,16 +747,6 @@ export default function WorldMap(): JSX.Element {
       playerMovementCallbacks.splice(playerMovementCallbacks.indexOf(movementDispatcher), 1);
     };
   }, [gameScene, playerMovementCallbacks]);
-
-  useEffect(() => {
-    const songDispatcher = (player: ServerPlayer) => {
-      gameScene?.updatePlayerSong(Player.fromServerPlayer(player));
-    };
-    playerSpotifySongCallbacks.push(songDispatcher);
-    return () => {
-      playerSpotifySongCallbacks.splice(playerSpotifySongCallbacks.indexOf(songDispatcher), 1);
-    };
-  }, [gameScene, playerSpotifySongCallbacks]);
 
   useEffect(() => {
     gameScene?.updatePlayersLocations(players);
