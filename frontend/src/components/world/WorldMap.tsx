@@ -26,6 +26,7 @@ class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     label: Phaser.GameObjects.Text;
+    spotifyLabel: Phaser.GameObjects.Text;
   };
 
   private myPlayerID: string;
@@ -155,6 +156,7 @@ class CoveyGameScene extends Phaser.Scene {
       if (disconnectedPlayer.sprite) {
         disconnectedPlayer.sprite.destroy();
         disconnectedPlayer.label?.destroy();
+        disconnectedPlayer.spotifyLabel?.destroy();
       }
     });
     // Remove disconnected players from list
@@ -194,14 +196,22 @@ class CoveyGameScene extends Phaser.Scene {
           color: '#000000',
           backgroundColor: '#ffffff',
         });
+        const spotifyLabel = this.add.text(0, 0, myPlayer.userName, {
+          font: '18px monospace',
+          color: '#000000',
+          backgroundColor: '#ffffff',
+        });
         myPlayer.label = label;
         myPlayer.sprite = sprite;
+        myPlayer.spotifyLabel = spotifyLabel;
       }
       if (!sprite.anims) return;
       sprite.setX(player.location.x);
       sprite.setY(player.location.y);
       myPlayer.label?.setX(player.location.x);
       myPlayer.label?.setY(player.location.y - 20);
+      myPlayer.spotifyLabel?.setX(player.location.x);
+      myPlayer.spotifyLabel?.setY(player.location.y - 40);
       if (player.location.moving) {
         sprite.anims.play(`misa-${player.location.rotation}-walk`, true);
       } else {
@@ -278,6 +288,8 @@ class CoveyGameScene extends Phaser.Scene {
       const isMoving = primaryDirection !== undefined;
       this.player.label.setX(body.x);
       this.player.label.setY(body.y - 20);
+      this.player.spotifyLabel.setX(body.x);
+      this.player.spotifyLabel.setY(body.y - 40);
       if (
         !this.lastLocation ||
         this.lastLocation.x !== body.x ||
@@ -472,9 +484,16 @@ class CoveyGameScene extends Phaser.Scene {
       // padding: {x: 20, y: 10},
       backgroundColor: '#ffffff',
     });
+    const spotifyLabel = this.add.text(spawnPoint.x, spawnPoint.y - 40, '', {
+      font: '18px monospace',
+      color: '#000000',
+      // padding: {x: 20, y: 10},
+      backgroundColor: '#ffffff',
+    });
     this.player = {
       sprite,
       label,
+      spotifyLabel
     };
 
     /* Configure physics overlap behavior for when the player steps into

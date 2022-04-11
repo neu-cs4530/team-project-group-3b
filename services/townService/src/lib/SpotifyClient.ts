@@ -30,7 +30,7 @@ export default class SpotifyClient {
   constructor(spotifyClientID: string,
     spotifyClientSecret: string,
     spotifyRedirectURI: string) {
-    // this._townsToPlayerMaps = new Map<string, Map<Player, string>>();
+    SpotifyClient._townsToPlayerMaps = new Map<string, Map<Player, string>>();
 
     this._spotifyClientID = spotifyClientID;
 
@@ -73,7 +73,8 @@ export default class SpotifyClient {
     try {
       const response = await axios.get(apiURL, { 
         headers: { 
-          'Authorization': `Bearer ${playerToken}`,
+          // 'Authorization': `Bearer ${playerToken}`,
+          'Authorization': `Bearer BQCeBb5J-j-sWoohiCbEoZqxURvQZ0XPWkl4AOy9TJNLAeRa2DxwATkkftq4Ovo8VEMiwoXfr8l9kuKG_y_XOgQZ73dAg5PFl66z88XppN7eJ0anPvqqbo2N1eo3jGmoBZyOhqnA4-z4Mt2K-ZZc5yEAYuQVHKcRQbysiHbco5lSO4iIdE5j6A`,
           'Content-Type': 'application/json',
         },
       });

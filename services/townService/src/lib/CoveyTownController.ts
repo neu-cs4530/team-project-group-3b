@@ -5,6 +5,7 @@ import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import IVideoClient from './IVideoClient';
+import SpotifyClient from './SpotifyClient';
 import TwilioVideo from './TwilioVideo';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
@@ -63,6 +64,8 @@ export default class CoveyTownController {
   /** The videoClient that this CoveyTown will use to provision video resources * */
   private _videoClient: IVideoClient = TwilioVideo.getInstance();
 
+  private _spotifyClient: SpotifyClient = SpotifyClient.getInstance();
+
   /** The list of CoveyTownListeners that are subscribed to events in this town * */
   private _listeners: CoveyTownListener[] = [];
 
@@ -78,6 +81,19 @@ export default class CoveyTownController {
   private _isPubliclyListed: boolean;
 
   private _capacity: number;
+
+  // todo find a prettier and more efficient way to update Spotify currently playing song
+  intervalID = setInterval(this.updatePlayerSongs, 5000, this.players);
+
+  updatePlayerSongs(players: Player[])
+  {
+    if (players) {
+      players.forEach(async player => {
+        const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(this.coveyTownID, player);
+        player.spotifySong = currentPlayingSong;
+      });
+    }
+  }
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();

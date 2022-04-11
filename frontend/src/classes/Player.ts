@@ -9,6 +9,8 @@ export default class Player {
 
   public label?: Phaser.GameObjects.Text;
 
+  public spotifyLabel?: Phaser.GameObjects.Text;
+
   constructor(id: string, userName: string, location: UserLocation) {
     this._id = id;
     this._userName = userName;
@@ -27,7 +29,7 @@ export default class Player {
     return new Player(playerFromServer._id, playerFromServer._userName, playerFromServer.location);
   }
 }
-export type ServerPlayer = { _id: string, _userName: string, location: UserLocation };
+export type ServerPlayer = { _id: string, _userName: string, location: UserLocation, song: string };
 
 export type Direction = 'front'|'back'|'left'|'right';
 

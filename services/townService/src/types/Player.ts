@@ -18,6 +18,8 @@ export default class Player {
   /** The current ConversationArea that the player is in, or undefined if they are not located within one */
   private _activeConversationArea?: ServerConversationArea;
 
+  private _spotifySong?: string;
+
   constructor(userName: string) {
     this.location = {
       x: 0,
@@ -43,6 +45,14 @@ export default class Player {
 
   set activeConversationArea(conversationArea: ServerConversationArea | undefined) {
     this._activeConversationArea = conversationArea;
+  }
+
+  get spotifySong(): string | undefined {
+    return this._spotifySong;
+  }
+
+  set spotifySong(song: string | undefined) {
+    this._spotifySong = song;
   }
 
   /**
