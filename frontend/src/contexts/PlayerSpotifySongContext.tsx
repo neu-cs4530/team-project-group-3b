@@ -1,7 +1,7 @@
 import React from 'react';
 import { ServerPlayer } from '../classes/Player';
 
-export type PlayerSpotifySongCallback = (playerMoved: ServerPlayer) => void;
+export type PlayerSpotifySongCallback = (playerSpotifySongChanged: ServerPlayer) => void;
 
 const Context = React.createContext<PlayerSpotifySongCallback[]>([]);
 

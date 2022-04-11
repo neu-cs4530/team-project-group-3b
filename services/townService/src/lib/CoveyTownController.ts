@@ -92,6 +92,8 @@ export default class CoveyTownController {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(coveyTownID, player);
         if (currentPlayingSong !== player.spotifySong) {
           player.spotifySong = currentPlayingSong ? currentPlayingSong : '';
+
+          this._listeners?.forEach(listener => listener.onPlayerSpotifySongChanged(player));
         }
         
         console.log(player.spotifySong);

@@ -6,6 +6,7 @@ import Player from './Player';
  * A listener for player-related events in each town
  */
 export default interface CoveyTownListener {
+  onPlayerSpotifySongChanged(player: Player): void;
   /**
    * Called when a player joins a town
    * @param newPlayer the new player
