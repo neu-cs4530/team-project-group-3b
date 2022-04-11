@@ -9,7 +9,7 @@ export default class Player {
 
   public label?: Phaser.GameObjects.Text;
 
-  public spotifyLabel?: Phaser.GameObjects.Text;
+  public songLabel?: Phaser.GameObjects.Text;
 
   public song?: string;
 

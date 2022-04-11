@@ -82,15 +82,19 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
-  // todo find a prettier and more efficient way to update Spotify currently playing song
-  intervalID = setInterval(this.updatePlayerSongs, 5000, this.players);
+  // get song via spotify client periodically
+  intervalID = setInterval(this.updatePlayerSongs, 5000, this.players, process.env.DEMO_TOWN_ID);
 
-  updatePlayerSongs(players: Player[])
+  updatePlayerSongs(players: Player[], coveyTownID: string)
   {
-    if (players) {
+    if (players && coveyTownID) {
       players.forEach(async player => {
-        const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(this.coveyTownID, player);
-        player.spotifySong = currentPlayingSong;
+        const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(coveyTownID, player);
+        if (currentPlayingSong !== player.spotifySong) {
+          player.spotifySong = currentPlayingSong ? currentPlayingSong : '';
+        }
+        
+        console.log(player.spotifySong);
       });
     }
   }
