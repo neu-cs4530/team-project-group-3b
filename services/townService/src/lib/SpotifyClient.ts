@@ -117,7 +117,6 @@ export default class SpotifyClient {
       expiry: tokenJson.expiry,
     }
     playerToToken?.set(player, token);
-    console.log(SpotifyClient._townsToPlayerMaps.get(coveyTownID));
   }
 
   static removeTownPlayerFromClient(coveyTownID: string, player: Player): void {

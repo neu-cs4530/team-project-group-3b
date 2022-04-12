@@ -186,6 +186,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         recalculateNearbyPlayers();
       });
       socket.on('playerMoved', (player: ServerPlayer) => {
+        console.log('playerMoved');
         if (player._id !== gamePlayerID) {
           const now = Date.now();
           playerMovementCallbacks.forEach(cb => cb(player));

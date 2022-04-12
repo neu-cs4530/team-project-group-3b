@@ -225,6 +225,7 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('playerMoved', movedPlayer);
     },
     onPlayerSongUpdated(updatedPlayer: Player) {
+      console.log('playersongupdated for ' + updatedPlayer.userName);
       socket.emit('playerSongUpdated', updatedPlayer);
     },
     onPlayerDisconnected(removedPlayer: Player) {

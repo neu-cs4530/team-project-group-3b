@@ -83,9 +83,9 @@ export default class CoveyTownController {
   private _capacity: number;
 
   // get song via spotify client periodically
-  intervalID = setInterval(this.updatePlayerSongs, 5000, this.players, process.env.DEMO_TOWN_ID);
+  intervalID = setInterval(this.updatePlayerSongs, 5000, this.players, this._listeners, process.env.DEMO_TOWN_ID);
 
-  updatePlayerSongs(players: Player[], coveyTownID: string)
+  updatePlayerSongs(players: Player[], listeners: CoveyTownListener[], coveyTownID: string)
   {
     if (players && coveyTownID) {
       players.forEach(async player => {
@@ -95,8 +95,14 @@ export default class CoveyTownController {
 
           
         }
-        if (this._listeners) {
-          this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
+        console.log("players")
+        console.log(this.players);
+        console.log("town name");
+        console.log(this.coveyTownID);
+        console.log("the listeners");
+        console.log(this._listeners);
+        if (listeners) {
+          listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
         console.log(player.spotifySong);
       });
