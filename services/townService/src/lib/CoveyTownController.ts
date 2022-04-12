@@ -95,12 +95,6 @@ export default class CoveyTownController {
 
           
         }
-        console.log("players")
-        console.log(this.players);
-        console.log("town name");
-        console.log(this.coveyTownID);
-        console.log("the listeners");
-        console.log(this._listeners);
         if (listeners) {
           listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }

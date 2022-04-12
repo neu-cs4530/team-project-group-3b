@@ -183,12 +183,18 @@ class CoveyGameScene extends Phaser.Scene {
   updatePlayerLocation(player: Player) {
     let myPlayer = this.players.find(p => p.id === player.id);
     if (myPlayer) {
-      const label = this.add.text(0, 0, myPlayer.userName + (player.song ? player.song : ''), {
+      const label = this.add.text(0, 0, myPlayer.userName, {
         font: '18px monospace',
         color: '#000000',
         backgroundColor: '#ffffff',
       });
       myPlayer.label = label;
+      const spotifyLabel = this.add.text(0, 0, player.song ? player.song : '', {
+        font: '18px monospace',
+        color: '#000000',
+        backgroundColor: '#ffffff',
+      });
+      myPlayer.songLabel = spotifyLabel;
     }
     
     if (!myPlayer) {
@@ -213,7 +219,7 @@ class CoveyGameScene extends Phaser.Scene {
           .sprite(0, 0, 'atlas', 'misa-front')
           .setSize(30, 40)
           .setOffset(0, 24);
-        const label = this.add.text(0, 0, myPlayer.userName + (player.song ? player.song : ''), {
+        const label = this.add.text(0, 0, myPlayer.userName, {
           font: '18px monospace',
           color: '#000000',
           backgroundColor: '#ffffff',
