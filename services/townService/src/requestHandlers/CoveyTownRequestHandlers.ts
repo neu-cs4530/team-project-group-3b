@@ -117,7 +117,6 @@ export async function townJoinHandler(requestData: TownJoinRequest): Promise<Res
   
   if(requestData.spotifySessionToken) {
     // newSession.spotifyToken = requestData.spotifySessionToken;
-
     SpotifyClient.addTownPlayerToClient(requestData.coveyTownID, newPlayer, requestData.spotifySessionToken);
   }
 

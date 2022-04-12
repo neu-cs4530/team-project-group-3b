@@ -2,10 +2,21 @@
 import assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
+import { access } from 'fs';
 import Player from '../types/Player';
 // import ISpotifyClientStatic from './ISpotifyClient';
 
 dotenv.config();
+
+/**
+ * The format of a spotify token, with the access token and the expiry time
+ */
+ export interface SpotifyToken {
+  /** The access token for the spotify session * */
+  accessToken: string;
+  /** The expiry time of the spotify token * */
+  expiry: number;
+}
 
 // 1 hour: each client will time out after 1 hour of listening and need to refresh
 const MAX_ALLOWED_SESSION_DURATION = 3600;
@@ -19,7 +30,7 @@ export default class SpotifyClient {
   private static _instance: SpotifyClient;
 
   // maps coveyTownIDs to a map from Players to their spotifyTokens
-  private static _townsToPlayerMaps: Map<string, Map<Player, string>>;
+  private static _townsToPlayerMaps: Map<string, Map<Player, SpotifyToken>>;
 
   private _spotifyClientID: string;
 
@@ -30,7 +41,7 @@ export default class SpotifyClient {
   constructor(spotifyClientID: string,
     spotifyClientSecret: string,
     spotifyRedirectURI: string) {
-    SpotifyClient._townsToPlayerMaps = new Map<string, Map<Player, string>>();
+    SpotifyClient._townsToPlayerMaps = new Map<string, Map<Player, SpotifyToken>>();
 
     this._spotifyClientID = spotifyClientID;
 
@@ -60,7 +71,9 @@ export default class SpotifyClient {
     if (this) {
       const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
-      return playerToToken?.get(player);
+      const fullToken = playerToToken?.get(player);
+      const accessToken = fullToken?.accessToken;
+      return accessToken;
     }
     return undefined;
   }
@@ -86,7 +99,7 @@ export default class SpotifyClient {
   }
 
   static addTownToClient(coveyTownID: string): void {
-    const playerToToken = new Map<Player, string>();
+    const playerToToken = new Map<Player, SpotifyToken>();
 
     SpotifyClient._townsToPlayerMaps.set(coveyTownID, playerToToken);
   }
@@ -98,7 +111,13 @@ export default class SpotifyClient {
   static addTownPlayerToClient(coveyTownID: string, player: Player, spotifyToken: string): void {
     const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
-    playerToToken?.set(player, spotifyToken);
+    const tokenJson = JSON.parse(spotifyToken);
+    const token: SpotifyToken = {
+      accessToken: tokenJson.access_token,
+      expiry: tokenJson.expiry,
+    }
+    playerToToken?.set(player, token);
+    console.log(SpotifyClient._townsToPlayerMaps.get(coveyTownID));
   }
 
   static removeTownPlayerFromClient(coveyTownID: string, player: Player): void {
