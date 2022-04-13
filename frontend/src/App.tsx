@@ -208,11 +208,8 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       });
       // todo listen for playerSpotifySongUpdated
       socket.on('playerSongUpdated', (player: ServerPlayer) => {
-        console.log(`playerSongUpdated ${player._userName} ${player._song}`);
-        console.log(JSON.stringify(player));
         const updatePlayer = localPlayers.filter(p => p.id === player._id)[0];
         updatePlayer.song = player._song;
-        console.log(`updatedplayer ${updatePlayer.userName} ${updatePlayer.song}`);
         setPlayersInTown(localPlayers);
       });
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {

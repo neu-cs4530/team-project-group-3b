@@ -147,9 +147,20 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   updatePlayerSong(player: Player) {
+    console.log(`update player song: ${player.userName} ${player.song}`);
     const myPlayer = this.players.find(p => p.id === player.id);
-    if (myPlayer) {
+    if (myPlayer && this.myPlayerID !== myPlayer.id && this.physics && player.location) {
+      console.log(`${myPlayer} && ${this.myPlayerID} !== ${myPlayer.id} && ${this.physics} && ${player.location}`);
       myPlayer.song = player.song;
+      const spotifyLabel = this.add.text(0, 0, player.song ? player.song : '', {
+        font: '18px monospace',
+        color: '#000000',
+        backgroundColor: '#ffffff',
+      });
+      myPlayer.songLabel = spotifyLabel;
+      
+      myPlayer.songLabel?.setX(player.location.x);
+      myPlayer.songLabel?.setY(player.location.y - 40);
     }
   }
 
@@ -182,20 +193,20 @@ class CoveyGameScene extends Phaser.Scene {
 
   updatePlayerLocation(player: Player) {
     let myPlayer = this.players.find(p => p.id === player.id);
-    if (myPlayer) {
-      const label = this.add.text(0, 0, myPlayer.userName, {
-        font: '18px monospace',
-        color: '#000000',
-        backgroundColor: '#ffffff',
-      });
-      myPlayer.label = label;
-      const spotifyLabel = this.add.text(0, 0, player.song ? player.song : '', {
-        font: '18px monospace',
-        color: '#000000',
-        backgroundColor: '#ffffff',
-      });
-      myPlayer.songLabel = spotifyLabel;
-    }
+    // if (myPlayer) {
+    //   const label = this.add.text(0, 0, myPlayer.userName, {
+    //     font: '18px monospace',
+    //     color: '#000000',
+    //     backgroundColor: '#ffffff',
+    //   });
+    //   myPlayer.label = label;
+    //   const spotifyLabel = this.add.text(0, 0, player.song ? player.song : '', {
+    //     font: '18px monospace',
+    //     color: '#000000',
+    //     backgroundColor: '#ffffff',
+    //   });
+    //   myPlayer.songLabel = spotifyLabel;
+    // }
     
     if (!myPlayer) {
       let { location } = player;
