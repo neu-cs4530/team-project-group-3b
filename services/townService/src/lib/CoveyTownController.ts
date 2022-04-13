@@ -82,21 +82,23 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
-  // get song via spotify client periodically
-  intervalID = setInterval(this.updatePlayerSongs, 5000, this.players, this._listeners, process.env.DEMO_TOWN_ID);
+  /** user for recurring function calls */
+  private _intervalID;
 
-  updatePlayerSongs(players: Player[], listeners: CoveyTownListener[], coveyTownID: string)
+  updatePlayerSongs(controller: CoveyTownController)
   {
-    if (players && coveyTownID) {
-      players.forEach(async player => {
-        const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(coveyTownID, player);
+    console.log("working")
+    console.log(`${controller._players}, ${controller.coveyTownID}, ${controller._listeners}`);
+    if (controller._players && controller.coveyTownID) {
+      controller._players.forEach(async player => {
+        const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(controller.coveyTownID, player);
         if (currentPlayingSong !== player.spotifySong) {
           player.spotifySong = currentPlayingSong ? currentPlayingSong : '';
 
           
         }
-        if (listeners) {
-          listeners.forEach(listener => listener.onPlayerSongUpdated(player));
+        if (controller._listeners) {
+          controller._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
         console.log(player.spotifySong);
       });
@@ -109,7 +111,8 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-  }
+    this._intervalID = setInterval(this.updatePlayerSongs, 5000, this);
+  }  
 
   /**
    * Adds a player to this Covey Town, provisioning the necessary credentials for the
@@ -141,7 +144,12 @@ export default class CoveyTownController {
    * @param session PlayerSession to destroy
    */
   destroySession(session: PlayerSession): void {
+    const p = this._players.find(p => p.id === session.player.id);
+    if(p != undefined) {
+      SpotifyClient.removeTownPlayerFromClient(this._coveyTownID, p);
+    }
     this._players = this._players.filter(p => p.id !== session.player.id);
+    console.log(`players: ${this._players}`);
     this._sessions = this._sessions.filter(s => s.sessionToken !== session.sessionToken);
     this._listeners.forEach(listener => listener.onPlayerDisconnected(session.player));
     const conversation = session.player.activeConversationArea;

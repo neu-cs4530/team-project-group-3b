@@ -91,8 +91,10 @@ export default class SpotifyClient {
         },
       });
     
+      console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
       return response;
     } catch (err) {
+      console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
       console.log(err);
       return undefined;
     }
@@ -123,6 +125,7 @@ export default class SpotifyClient {
     const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
     playerToToken?.delete(player);
+    console.log(SpotifyClient._townsToPlayerMaps);
   }
 
   public static async getSpotifyUserID(coveyTownID: string, player: Player): Promise<string | undefined> {
