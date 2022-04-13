@@ -4,6 +4,6 @@ import PlayerSpotifySongContext, { PlayerSpotifySongCallback } from '../contexts
 
 export default function usePlayerMovement(): PlayerSpotifySongCallback[] {
   const ctx = useContext(PlayerSpotifySongContext);
-  assert(ctx, 'Player movmeent context should be defined.');
+  assert(ctx, 'Player spotify song context should be defined.');
   return ctx;
 }

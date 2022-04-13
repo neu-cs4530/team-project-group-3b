@@ -8,6 +8,7 @@ import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
 import usePlayerMovement from '../../hooks/usePlayerMovement';
 import usePlayersInTown from '../../hooks/usePlayersInTown';
+import usePlayerSpotifySong from '../../hooks/usePlayerSpotifySong';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import NewConversationModal from './NewCoversationModal';
 
@@ -718,6 +719,7 @@ export default function WorldMap(): JSX.Element {
   const [newConversation, setNewConversation] = useState<ConversationArea>();
   const playerMovementCallbacks = usePlayerMovement();
   const players = usePlayersInTown();
+  const playerSongCallbacks = usePlayerSpotifySong();
 
   useEffect(() => {
     const config = {
@@ -772,6 +774,16 @@ export default function WorldMap(): JSX.Element {
   useEffect(() => {
     gameScene?.updatePlayersSongs(players);
   }, [gameScene, players]);
+
+  useEffect(() => {
+    const songChangeDispatcher = (player: Player) => {
+      gameScene?.updatePlayerSong(player);
+    };
+    playerSongCallbacks.push(songChangeDispatcher);
+    return () => {
+      playerSongCallbacks.splice(playerSongCallbacks.indexOf(songChangeDispatcher), 1);
+    };
+  }, [gameScene, playerSongCallbacks]);
 
   useEffect(() => {
     gameScene?.updateConversationAreas(conversationAreas);
