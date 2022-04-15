@@ -144,11 +144,11 @@ export default class CoveyTownController {
    * @param session PlayerSession to destroy
    */
   destroySession(session: PlayerSession): void {
-    const p = this._players.find(p => p.id === session.player.id);
-    if(p != undefined) {
+    const p = this._players.find(player => player.id === session.player.id);
+    if (p !== undefined) {
       SpotifyClient.removeTownPlayerFromClient(this._coveyTownID, p);
     }
-    this._players = this._players.filter(p => p.id !== session.player.id);
+    this._players = this._players.filter(player => player.id !== session.player.id);
     console.log(`players: ${this._players}`);
     this._sessions = this._sessions.filter(s => s.sessionToken !== session.sessionToken);
     this._listeners.forEach(listener => listener.onPlayerDisconnected(session.player));

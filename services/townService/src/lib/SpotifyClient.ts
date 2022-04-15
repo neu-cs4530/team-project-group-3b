@@ -2,7 +2,7 @@
 import assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
-import { access } from 'fs';
+// import { access } from 'fs';
 import Player from '../types/Player';
 // import ISpotifyClientStatic from './ISpotifyClient';
 
@@ -11,7 +11,7 @@ dotenv.config();
 /**
  * The format of a spotify token, with the access token and the expiry time
  */
- export interface SpotifyToken {
+export interface SpotifyToken {
   /** The access token for the spotify session * */
   accessToken: string;
   /** The expiry time of the spotify token * */
@@ -19,12 +19,12 @@ dotenv.config();
 }
 
 // 1 hour: each client will time out after 1 hour of listening and need to refresh
-const MAX_ALLOWED_SESSION_DURATION = 3600;
+/* const MAX_ALLOWED_SESSION_DURATION = 3600;
 declare global {
   interface Error {
     code: undefined;
   }
-}
+} */
 
 export default class SpotifyClient {
   private static _instance: SpotifyClient;
@@ -117,7 +117,7 @@ export default class SpotifyClient {
     const token: SpotifyToken = {
       accessToken: tokenJson.access_token,
       expiry: tokenJson.expiry,
-    }
+    };
     playerToToken?.set(player, token);
   }
 
