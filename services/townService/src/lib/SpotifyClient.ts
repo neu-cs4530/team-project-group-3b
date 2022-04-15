@@ -26,6 +26,13 @@ declare global {
   }
 } */
 
+/**
+ * A wrapper object class for the Spotify API.
+ * Includes functionality for making calls to the Spotify API. Support calls include:
+ *  - getting basic information on a user's Spotify account
+ *  - getting information on a user's currently playing track
+ *  - request to the Spotify API to start playing a certain track and timestamp on a user's device
+ */
 export default class SpotifyClient {
   private static _instance: SpotifyClient;
 
@@ -67,6 +74,14 @@ export default class SpotifyClient {
     return SpotifyClient._instance;
   }
 
+  /**
+   * A method for retreiving the Spotify access token corresponding to a user.
+   * This is the access token required to make Spotify API calls for that user's Spotify account.
+   * 
+   * @param coveyTownID the coveyTownID of the town a player is currently in
+   * @param player the Player object for the intended user
+   * @returns a user's Spotify access token corresponding to this Player
+   */
   static getTokenForTownPlayer(coveyTownID: string, player: Player): string | undefined {
     if (this) {
       const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
@@ -78,6 +93,15 @@ export default class SpotifyClient {
     return undefined;
   }
 
+  /**
+   * A generic method for making a GET call to the Spotify API for a user's account.
+   * Allows SpotifyClient to make any Spotify API call of the GET method.
+   * 
+   * @param apiURL the HTTP URL destination to call
+   * @param coveyTownID the coveyTownID of the town a player is currently in
+   * @param player the Player object for the intended user
+   * @returns the AxiosResponse returned by the call, or undefined if the call is unsuccessful
+   */
   private static async getSpotifyAPICallResponse(apiURL: string, 
     coveyTownID: string, 
     player: Player): Promise<AxiosResponse<any> | undefined> {
@@ -100,16 +124,36 @@ export default class SpotifyClient {
     }
   }
 
+  /**
+   * A method to add a Covey Town to SpotifyClient's data structure.
+   * Intended to be called when a town is created.
+   * 
+   * @param coveyTownID the coveyTownID corresponding to the town to be added
+   */
   static addTownToClient(coveyTownID: string): void {
     const playerToToken = new Map<Player, SpotifyToken>();
 
     SpotifyClient._townsToPlayerMaps.set(coveyTownID, playerToToken);
   }
 
+  /**
+   * A method to remove a Covey Town from SpotifyClient's data structure.
+   * Intended to be called when a town is destroyed.
+   * 
+   * @param coveyTownID the coveyTownID corresponding to the town to be removed
+   */
   static removeTownFromClient(coveyTownID: string): void {
     SpotifyClient._townsToPlayerMaps.delete(coveyTownID);
   }
 
+  /**
+   * A method to add a Player to SpotifyClient's data structure.
+   * Intended to be called when a Player joins a town.
+   * 
+   * @param coveyTownID the coveyTownID of the town a player is currently in
+   * @param player the Player object for the intended user
+   * @param spotifyToken the Spotify access token corresponding to the intended user
+   */
   static addTownPlayerToClient(coveyTownID: string, player: Player, spotifyToken: string): void {
     const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
@@ -121,6 +165,13 @@ export default class SpotifyClient {
     playerToToken?.set(player, token);
   }
 
+  /**
+   * A method to remove a Player from SpotifyClient's data structure.
+   * Intended to be called when a Player leaves a town.
+   * 
+   * @param coveyTownID the coveyTownID of the town a player is currently in
+   * @param player the Player object for the intended user
+   */
   static removeTownPlayerFromClient(coveyTownID: string, player: Player): void {
     const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
@@ -128,6 +179,15 @@ export default class SpotifyClient {
     console.log(SpotifyClient._townsToPlayerMaps);
   }
 
+  /**
+   * A method to make a call to get a user's Spotify account information.
+   * Specifically parses through the API response to get a user's Spotify user ID.
+   * 
+   * @param coveyTownID the coveyTownID of the town a player is currently in
+   * @param player the Player object for the intended user
+   * @returns a user's Spotify user ID (username), or underfined if there is an error
+   *          making the API call
+   */
   public static async getSpotifyUserID(coveyTownID: string, player: Player): Promise<string | undefined> {
     // scope = 'user-read-private user-read-email'
 
@@ -146,6 +206,16 @@ export default class SpotifyClient {
     return undefined;
   }
 
+  /**
+   * A method to make a call to get information on a user's currently playing 
+   * track on Spotify.
+   * Specifically parses through the API response to get the song title and artist.
+   * 
+   * @param coveyTownID the coveyTownID of the town a player is currently in
+   * @param player the Player object for the intended user
+   * @returns a string with a user's currently playing song title and artist, or
+   *          undefined if no song is currently playing (or if there is an error making the call)
+   */
   public static async getCurrentPlayingSong(coveyTownID: string, player: Player): Promise<string | undefined> {
     // scope = 'user-read-currently-playing'
 
