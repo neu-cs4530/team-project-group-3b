@@ -10,9 +10,6 @@ const mockCoveyListenerOtherFns = jest.fn();
 
 function mockCoveyListener(): CoveyTownListener {
   return {
-    onPlayerSongUpdated(updatedPlayer: Player): void {
-      mockCoveyListenerOtherFns(updatedPlayer);
-    },
     onPlayerDisconnected(removedPlayer: Player): void {
       mockCoveyListenerOtherFns(removedPlayer);
     },

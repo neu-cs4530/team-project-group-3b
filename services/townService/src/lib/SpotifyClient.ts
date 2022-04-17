@@ -20,17 +20,15 @@ export interface SpotifyToken {
 
 /**
  * The format of a Spotify song, with the display title (title and artist), 
- * Spotify song uri, and progression (timestamp) in milliseconds
+ * Spotify song uris, and progression (timestamp) in milliseconds
  */
 export interface SongData {
   /** The display title for the song * */
   displayTitle: string;
-  /** The Spotify context uri for the song * */
-  contextUri: string;
-  /** Additional Spotify uris for the song */
+  /** The Spotify uris associated with the song */
   uris: Array<string>;
-  /** The progression (timestamp) in the song, in ms */
-  progression: number;
+  /** The progress (timestamp) in the song, in ms */
+  progress: number;
 }
 
 /**
@@ -241,17 +239,14 @@ export default class SpotifyClient {
 
         const currentTrackDisplayTitle = `${currentTrackTitle} by ${currentTrackArtist}`;
 
-        const currentTrackContextUri = await currentTrackJsonData.context.uri;
-
         const currentSongUri = await currentTrackJsonData.item.uri;
 
         const currentTrackProgress = await currentTrackJsonData.progress_ms;
 
         const currentSongData: SongData = await {
           displayTitle: currentTrackDisplayTitle,
-          contextUri: currentTrackContextUri,
           uris: [currentSongUri],
-          progression: currentTrackProgress,
+          progress: currentTrackProgress,
         };
         
         return `${currentTrackTitle} by ${currentTrackArtist}`;
@@ -270,31 +265,30 @@ export default class SpotifyClient {
    * @param coveyTownID the coveyTownID of the town a player is currently in
    * @param player the Player object for the intended user
    * @param songData the songData describing the song to be played
-   * @returns a message describing whether or not the API call was successful
+   * @returns whether or not the API call was successful
    */
-  public static async startUserPlayback(coveyTownID: string, player: Player, songData: SongData): Promise<string> {
-    // const scope = 'user-modify-playback-state'
+  public static async startUserPlayback(coveyTownID: string, player: Player, songData: SongData): Promise<boolean> {
+    // scope = 'user-modify-playback-state'
 
     const playerToken = SpotifyClient.getTokenForTownPlayer(coveyTownID, player);
 
     try {
-      const response = await axios.put('https://api.spotify.com/v1/me/player/play', { 
+      await axios.put('https://api.spotify.com/v1/me/player/play', { 
         headers: { 
           'Authorization': `Bearer ${playerToken}`,
           'Content-Type': 'application/json',
         },
-
+        json: {
+          'uris': songData.uris,
+          'progress_ms': songData.progress,
+        },
       });
     
-      console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
-      // return response;
+      return true;
     } catch (err) {
-      console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
       console.log(err);
-      // return undefined;
+      return false;
     }
-
-    return 'Bogus Return string for startUserPlayback';
   }
   
 }

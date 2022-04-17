@@ -64,6 +64,7 @@ export default class CoveyTownController {
   /** The videoClient that this CoveyTown will use to provision video resources * */
   private _videoClient: IVideoClient = TwilioVideo.getInstance();
 
+  /** The spotifyClient that this CoveyTown will use to handle Spotify interactions */
   private _spotifyClient: SpotifyClient = SpotifyClient.getInstance();
 
   /** The list of CoveyTownListeners that are subscribed to events in this town * */
