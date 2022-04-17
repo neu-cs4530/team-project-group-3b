@@ -9,6 +9,7 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import usePlayerMovement from '../../hooks/usePlayerMovement';
 import usePlayersInTown from '../../hooks/usePlayersInTown';
 import usePlayerSpotifySong from '../../hooks/usePlayerSpotifySong';
+import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import NewConversationModal from './NewCoversationModal';
 
@@ -816,9 +817,12 @@ export default function WorldMap(): JSX.Element {
   }, [video, newConversation, setNewConversation]);
 
   return (
-    <>
+    <div id='app-container'>
       {newConversationModal}
       <div id='map-container' />
-    </>
+      <div id='social-container'>
+        <SocialSidebar />
+      </div>
+    </div>
   );
 }
