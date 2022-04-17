@@ -42,7 +42,8 @@ export default class SpotifyClient {
   private static _instance: SpotifyClient;
 
   // maps coveyTownIDs to a map from Players to their spotifyTokens
-  private static _townsToPlayerMaps: Map<string, Map<Player, SpotifyToken>>;
+  private static _townsToPlayerMaps: Map<string, Map<Player, SpotifyToken>> 
+  = new Map<string, Map<Player, SpotifyToken>>();
 
   private _spotifyClientID: string;
 
