@@ -1,3 +1,12 @@
+export interface SongData {
+  /** The display title for the song * */
+  displayTitle: string;
+  /** The Spotify uris associated with the song */
+  uris: Array<string>;
+  /** The progress (timestamp) in the song, in ms */
+  progress: number;
+}
+
 export default class Player {
   public location?: UserLocation;
 
@@ -11,9 +20,9 @@ export default class Player {
 
   public songLabel?: Phaser.GameObjects.Text;
 
-  public song?: string;
+  public song?: SongData;
 
-  constructor(id: string, userName: string, location: UserLocation, song: string) {
+  constructor(id: string, userName: string, location: UserLocation, song: SongData) {
     this._id = id;
     this._userName = userName;
     this.location = location;
@@ -32,7 +41,7 @@ export default class Player {
     return new Player(playerFromServer._id, playerFromServer._userName, playerFromServer.location, playerFromServer._song);
   }
 }
-export type ServerPlayer = { _id: string, _userName: string, location: UserLocation, _song: string };
+export type ServerPlayer = { _id: string, _userName: string, location: UserLocation, _song: SongData };
 
 export type Direction = 'front'|'back'|'left'|'right';
 

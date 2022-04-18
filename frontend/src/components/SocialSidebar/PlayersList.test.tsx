@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { mock } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import React from 'react';
-import Player, { UserLocation } from '../../classes/Player';
+import Player, { SongData, UserLocation } from '../../classes/Player';
 import { CoveyAppState } from '../../CoveyTypes';
 import * as useCoveyAppState from '../../hooks/useCoveyAppState';
 import * as usePlayersInTown from '../../hooks/usePlayersInTown';
@@ -28,6 +28,11 @@ describe('PlayersInTownList', () => {
     </ChakraProvider>
   );
   const renderPlayersList = () => render(wrappedPlayersListComponent());
+  const testingSong: SongData = {
+    displayTitle: 'Testing by The Tests',
+    uris: [],
+    progress: -1,
+  }
   let consoleErrorSpy: jest.SpyInstance<void, [message?: any, ...optionalParms: any[]]>;
   let usePlayersInTownSpy: jest.SpyInstance<Player[], []>;
   let useCoveyAppStateSpy: jest.SpyInstance<CoveyAppState, []>;
@@ -76,7 +81,7 @@ describe('PlayersInTownList', () => {
           `testingPlayerID${i}-${nanoid()}`,
           `testingPlayerUser${i}-${nanoid()}}`,
           randomLocation(),
-          "Test Song by Testing",
+          testingSong,
         ),
       );
     }
@@ -136,7 +141,7 @@ describe('PlayersInTownList', () => {
     await expectProperlyRenderedPlayersList(renderData, players);
     for (let i = 0; i < players.length; i += 1) {
       const newPlayers = players.concat([
-        new Player(`testingPlayerID-${i}.new`, `testingPlayerUser${i}.new`, randomLocation(), "Test Song by Testing"),
+        new Player(`testingPlayerID-${i}.new`, `testingPlayerUser${i}.new`, randomLocation(), testingSong),
       ]);
       usePlayersInTownSpy.mockReturnValue(newPlayers);
       renderData.rerender(wrappedPlayersListComponent());

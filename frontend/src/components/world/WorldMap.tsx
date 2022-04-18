@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import React, { useEffect, useMemo, useState } from 'react';
 import BoundingBox from '../../classes/BoundingBox';
 import ConversationArea from '../../classes/ConversationArea';
-import Player, { ServerPlayer, UserLocation } from '../../classes/Player';
+import Player, { ServerPlayer, SongData, UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
@@ -149,12 +149,12 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   updatePlayerSong(player: Player) {
-    console.log(`update player song: ${player.userName} ${player.song}`);
+    console.log(`update player song: ${player.userName} ${player.song?.displayTitle}`);
     const myPlayer = this.players.find(p => p.id === player.id);
     if (myPlayer && this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       console.log(`${myPlayer} && ${this.myPlayerID} !== ${myPlayer.id} && ${this.physics} && ${player.location}`);
       myPlayer.song = player.song;
-      const spotifyLabel = this.add.text(0, 0, player.song ? player.song : '', {
+      const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {
         font: '18px monospace',
         color: '#000000',
         backgroundColor: '#ffffff',
@@ -202,7 +202,7 @@ class CoveyGameScene extends Phaser.Scene {
     //     backgroundColor: '#ffffff',
     //   });
     //   myPlayer.label = label;
-    //   const spotifyLabel = this.add.text(0, 0, player.song ? player.song : '', {
+    //   const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {
     //     font: '18px monospace',
     //     color: '#000000',
     //     backgroundColor: '#ffffff',
@@ -220,7 +220,8 @@ class CoveyGameScene extends Phaser.Scene {
           y: 0,
         };
       }
-      myPlayer = new Player(player.id, player.userName, location, '');
+      const undefinedSong: SongData = {displayTitle: '', uris: [], progress: -1} // maybe i should do something else
+      myPlayer = new Player(player.id, player.userName, location, undefinedSong);
       this.players.push(myPlayer);
     }
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
@@ -237,7 +238,7 @@ class CoveyGameScene extends Phaser.Scene {
           color: '#000000',
           backgroundColor: '#ffffff',
         });
-        const spotifyLabel = this.add.text(0, 0, player.song ? player.song : '', {
+        const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {
           font: '18px monospace',
           color: '#000000',
           backgroundColor: '#ffffff',
@@ -332,7 +333,7 @@ class CoveyGameScene extends Phaser.Scene {
 
       const myPlayer = this.players.find(p => p.id === this.myPlayerID);
       if (myPlayer && myPlayer.songLabel) {
-        myPlayer.songLabel.text = myPlayer.song ? myPlayer.song : '';
+        myPlayer.songLabel.text = myPlayer.song?.displayTitle ? myPlayer.song.displayTitle : '';
       } 
       this.player.spotifyLabel.setX(body.x);
       this.player.spotifyLabel.setY(body.y - 40);
