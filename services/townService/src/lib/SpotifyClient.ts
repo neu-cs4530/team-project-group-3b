@@ -2,9 +2,7 @@
 import assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
-// import { access } from 'fs';
-import Player from '../types/Player';
-// import ISpotifyClientStatic from './ISpotifyClient';
+import Player, { SongData } from '../types/Player';
 
 dotenv.config();
 
@@ -16,19 +14,6 @@ export interface SpotifyToken {
   accessToken: string;
   /** The expiry time of the spotify token * */
   expiry: number;
-}
-
-/**
- * The format of a Spotify song, with the display title (title and artist), 
- * Spotify song uris, and progression (timestamp) in milliseconds
- */
-export interface SongData {
-  /** The display title for the song * */
-  displayTitle: string;
-  /** The Spotify uris associated with the song */
-  uris: Array<string>;
-  /** The progress (timestamp) in the song, in ms */
-  progress: number;
 }
 
 /**
@@ -222,7 +207,7 @@ export default class SpotifyClient {
    * @returns a string with a user's currently playing song title and artist, or
    *          undefined if no song is currently playing (or if there is an error making the call)
    */
-  public static async getCurrentPlayingSong(coveyTownID: string, player: Player): Promise<string | undefined> {
+  public static async getCurrentPlayingSong(coveyTownID: string, player: Player): Promise<SongData | undefined> {
     // scope = 'user-read-currently-playing'
 
     const currentTrackInfo = 
@@ -244,13 +229,14 @@ export default class SpotifyClient {
 
         const currentTrackProgress = await currentTrackJsonData.progress_ms;
 
-        const currentSongData: SongData = await {
+        const currentSongData: SongData = {
           displayTitle: currentTrackDisplayTitle,
           uris: [currentSongUri],
           progress: currentTrackProgress,
         };
         
-        return `${currentTrackTitle} by ${currentTrackArtist}`;
+        console.log(currentTrackDisplayTitle);
+        return currentSongData;
       }
     }
     
