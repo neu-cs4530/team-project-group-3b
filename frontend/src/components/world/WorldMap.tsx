@@ -154,6 +154,7 @@ class CoveyGameScene extends Phaser.Scene {
     if (myPlayer && this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       console.log(`${myPlayer} && ${this.myPlayerID} !== ${myPlayer.id} && ${this.physics} && ${player.location}`);
       myPlayer.song = player.song;
+      myPlayer.songLabel?.destroy();
       const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {
         font: '18px monospace',
         color: '#000000',
