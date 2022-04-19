@@ -22,7 +22,7 @@ export default class Player {
 
   public song?: SongData;
 
-  constructor(id: string, userName: string, location: UserLocation, song: SongData) {
+  constructor(id: string, userName: string, location: UserLocation, song?: SongData) {
     this._id = id;
     this._userName = userName;
     this.location = location;

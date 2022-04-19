@@ -131,8 +131,8 @@ describe('ConversationAreasList', () => {
               rotation: 'front',
               moving: false,
             },
-            "Testing Song by Test"
-          ,),
+            // "Testing Song by Test" // TODO is a song a necessary inclusion for this test?
+          ),
         );
       }
       allPlayers = allPlayers.concat(playersInThisArea);
