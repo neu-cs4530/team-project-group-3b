@@ -5,6 +5,7 @@ import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import IVideoClient from './IVideoClient';
+import SpotifyClient from './SpotifyClient';
 import TwilioVideo from './TwilioVideo';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
@@ -63,6 +64,9 @@ export default class CoveyTownController {
   /** The videoClient that this CoveyTown will use to provision video resources * */
   private _videoClient: IVideoClient = TwilioVideo.getInstance();
 
+  /** The spotifyClient that this CoveyTown will use to handle Spotify interactions */
+  private _spotifyClient: SpotifyClient = SpotifyClient.getInstance();
+
   /** The list of CoveyTownListeners that are subscribed to events in this town * */
   private _listeners: CoveyTownListener[] = [];
 
@@ -79,13 +83,36 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
+  /** user for recurring function calls */
+  private _intervalID;
+
+  updatePlayerSongs(controller: CoveyTownController)
+  {
+    console.log("working")
+    console.log(`${controller._players}, ${controller.coveyTownID}, ${controller._listeners}`);
+    if (controller._players && controller.coveyTownID) {
+      controller._players.forEach(async player => {
+        const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(controller.coveyTownID, player);
+        if (!(currentPlayingSong?.displayTitle == player.spotifySong?.displayTitle
+          && currentPlayingSong?.progress == player.spotifySong?.progress)) {
+          player.spotifySong = currentPlayingSong ? currentPlayingSong : undefined;
+        }
+        if (controller._listeners) {
+          controller._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
+        }
+        console.log(player.spotifySong?.displayTitle);
+      });
+    }
+  }
+
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
     this._capacity = 50;
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-  }
+    this._intervalID = setInterval(this.updatePlayerSongs, 5000, this);
+  }  
 
   /**
    * Adds a player to this Covey Town, provisioning the necessary credentials for the
@@ -117,7 +144,12 @@ export default class CoveyTownController {
    * @param session PlayerSession to destroy
    */
   destroySession(session: PlayerSession): void {
-    this._players = this._players.filter(p => p.id !== session.player.id);
+    const p = this._players.find(player => player.id === session.player.id);
+    if (p !== undefined) {
+      SpotifyClient.removeTownPlayerFromClient(this._coveyTownID, p);
+    }
+    this._players = this._players.filter(player => player.id !== session.player.id);
+    console.log(`players: ${this._players}`);
     this._sessions = this._sessions.filter(s => s.sessionToken !== session.sessionToken);
     this._listeners.forEach(listener => listener.onPlayerDisconnected(session.player));
     const conversation = session.player.activeConversationArea;

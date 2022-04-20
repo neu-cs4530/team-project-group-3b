@@ -5,6 +5,7 @@ import { ChatMessage, CoveyTownList, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import { ConversationAreaCreateRequest, ServerConversationArea } from '../client/TownsServiceClient';
+import SpotifyClient from '../lib/SpotifyClient';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -114,8 +115,9 @@ export async function townJoinHandler(requestData: TownJoinRequest): Promise<Res
   const newPlayer = new Player(requestData.userName);
   const newSession = await coveyTownController.addPlayer(newPlayer);
   
-  if(requestData.spotifySessionToken != undefined) {
-    newSession.spotifyToken = requestData.spotifySessionToken;
+  if (requestData.spotifySessionToken) {
+    // newSession.spotifyToken = requestData.spotifySessionToken;
+    SpotifyClient.addTownPlayerToClient(requestData.coveyTownID, newPlayer, requestData.spotifySessionToken);
   }
 
   assert(newSession.videoToken);
@@ -150,6 +152,9 @@ export function townCreateHandler(requestData: TownCreateRequest): ResponseEnvel
     };
   }
   const newTown = townsStore.createTown(requestData.friendlyName, requestData.isPubliclyListed);
+
+  SpotifyClient.addTownToClient(newTown.coveyTownID);
+
   return {
     isOK: true,
     response: {
@@ -162,6 +167,9 @@ export function townCreateHandler(requestData: TownCreateRequest): ResponseEnvel
 export function townDeleteHandler(requestData: TownDeleteRequest): ResponseEnvelope<Record<string, null>> {
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.deleteTown(requestData.coveyTownID, requestData.coveyTownPassword);
+
+  SpotifyClient.removeTownFromClient(requestData.coveyTownID);
+
   return {
     isOK: success,
     response: {},
@@ -216,6 +224,10 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onPlayerMoved(movedPlayer: Player) {
       socket.emit('playerMoved', movedPlayer);
     },
+    onPlayerSongUpdated(updatedPlayer: Player) {
+      console.log(`playersongupdated for ${  updatedPlayer.userName  } ${  updatedPlayer.spotifySong?.displayTitle}`);
+      socket.emit('playerSongUpdated', updatedPlayer);
+    },
     onPlayerDisconnected(removedPlayer: Player) {
       socket.emit('playerDisconnect', removedPlayer);
     },
@@ -268,6 +280,7 @@ export function townSubscriptionHandler(socket: Socket): void {
   // clean up our listener adapter, and then let the CoveyTownController know that the
   // player's session is disconnected
   socket.on('disconnect', () => {
+    SpotifyClient.removeTownPlayerFromClient(coveyTownID, s.player);
     townController.removeTownListener(listener);
     townController.destroySession(s);
   });

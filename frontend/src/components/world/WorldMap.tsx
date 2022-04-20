@@ -2,12 +2,14 @@ import Phaser from 'phaser';
 import React, { useEffect, useMemo, useState } from 'react';
 import BoundingBox from '../../classes/BoundingBox';
 import ConversationArea from '../../classes/ConversationArea';
-import Player, { ServerPlayer, UserLocation } from '../../classes/Player';
+import Player, { ServerPlayer, SongData, UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useConversationAreas from '../../hooks/useConversationAreas';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
 import usePlayerMovement from '../../hooks/usePlayerMovement';
 import usePlayersInTown from '../../hooks/usePlayersInTown';
+import usePlayerSpotifySong from '../../hooks/usePlayerSpotifySong';
+import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import NewConversationModal from './NewCoversationModal';
 
@@ -26,6 +28,7 @@ class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     label: Phaser.GameObjects.Text;
+    spotifyLabel: Phaser.GameObjects.Text;
   };
 
   private myPlayerID: string;
@@ -139,6 +142,31 @@ class CoveyGameScene extends Phaser.Scene {
     });
   }
 
+  updatePlayersSongs(players: Player[]) {
+    players.forEach(p => {
+      this.updatePlayerSong(p);
+    });
+  }
+
+  updatePlayerSong(player: Player) {
+    console.log(`update player song: ${player.userName} ${player.song?.displayTitle}`);
+    const myPlayer = this.players.find(p => p.id === player.id);
+    if (myPlayer && this.myPlayerID !== myPlayer.id && this.physics && player.location) {
+      console.log(`${myPlayer} && ${this.myPlayerID} !== ${myPlayer.id} && ${this.physics} && ${player.location}`);
+      myPlayer.song = player.song;
+      myPlayer.songLabel?.destroy();
+      const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {
+        font: '18px monospace',
+        color: '#000000',
+        backgroundColor: '#ffffff',
+      });
+      myPlayer.songLabel = spotifyLabel;
+      
+      myPlayer.songLabel?.setX(player.location.x);
+      myPlayer.songLabel?.setY(player.location.y - 40);
+    }
+  }
+
   updatePlayersLocations(players: Player[]) {
     if (!this.ready) {
       this.players = players;
@@ -155,6 +183,7 @@ class CoveyGameScene extends Phaser.Scene {
       if (disconnectedPlayer.sprite) {
         disconnectedPlayer.sprite.destroy();
         disconnectedPlayer.label?.destroy();
+        disconnectedPlayer.songLabel?.destroy();
       }
     });
     // Remove disconnected players from list
@@ -167,6 +196,21 @@ class CoveyGameScene extends Phaser.Scene {
 
   updatePlayerLocation(player: Player) {
     let myPlayer = this.players.find(p => p.id === player.id);
+    // if (myPlayer) {
+    //   const label = this.add.text(0, 0, myPlayer.userName, {
+    //     font: '18px monospace',
+    //     color: '#000000',
+    //     backgroundColor: '#ffffff',
+    //   });
+    //   myPlayer.label = label;
+    //   const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {
+    //     font: '18px monospace',
+    //     color: '#000000',
+    //     backgroundColor: '#ffffff',
+    //   });
+    //   myPlayer.songLabel = spotifyLabel;
+    // }
+    
     if (!myPlayer) {
       let { location } = player;
       if (!location) {
@@ -177,7 +221,8 @@ class CoveyGameScene extends Phaser.Scene {
           y: 0,
         };
       }
-      myPlayer = new Player(player.id, player.userName, location);
+      const undefinedSong: SongData = {displayTitle: '', uris: [], progress: -1} // maybe i should do something else
+      myPlayer = new Player(player.id, player.userName, location, undefinedSong);
       this.players.push(myPlayer);
     }
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
@@ -194,14 +239,22 @@ class CoveyGameScene extends Phaser.Scene {
           color: '#000000',
           backgroundColor: '#ffffff',
         });
+        const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {
+          font: '18px monospace',
+          color: '#000000',
+          backgroundColor: '#ffffff',
+        });
         myPlayer.label = label;
         myPlayer.sprite = sprite;
+        myPlayer.songLabel = spotifyLabel;
       }
       if (!sprite.anims) return;
       sprite.setX(player.location.x);
       sprite.setY(player.location.y);
       myPlayer.label?.setX(player.location.x);
       myPlayer.label?.setY(player.location.y - 20);
+      myPlayer.songLabel?.setX(player.location.x);
+      myPlayer.songLabel?.setY(player.location.y - 40);
       if (player.location.moving) {
         sprite.anims.play(`misa-${player.location.rotation}-walk`, true);
       } else {
@@ -278,6 +331,13 @@ class CoveyGameScene extends Phaser.Scene {
       const isMoving = primaryDirection !== undefined;
       this.player.label.setX(body.x);
       this.player.label.setY(body.y - 20);
+
+      const myPlayer = this.players.find(p => p.id === this.myPlayerID);
+      if (myPlayer && myPlayer.songLabel) {
+        myPlayer.songLabel.text = myPlayer.song?.displayTitle ? myPlayer.song.displayTitle : '';
+      } 
+      this.player.spotifyLabel.setX(body.x);
+      this.player.spotifyLabel.setY(body.y - 40);
       if (
         !this.lastLocation ||
         this.lastLocation.x !== body.x ||
@@ -472,9 +532,16 @@ class CoveyGameScene extends Phaser.Scene {
       // padding: {x: 20, y: 10},
       backgroundColor: '#ffffff',
     });
+    const spotifyLabel = this.add.text(spawnPoint.x, spawnPoint.y - 40, '', {
+      font: '18px monospace',
+      color: '#000000',
+      // padding: {x: 20, y: 10},
+      backgroundColor: '#ffffff',
+    });
     this.player = {
       sprite,
       label,
+      spotifyLabel
     };
 
     /* Configure physics overlap behavior for when the player steps into
@@ -655,6 +722,7 @@ export default function WorldMap(): JSX.Element {
   const [newConversation, setNewConversation] = useState<ConversationArea>();
   const playerMovementCallbacks = usePlayerMovement();
   const players = usePlayersInTown();
+  const playerSongCallbacks = usePlayerSpotifySong();
 
   useEffect(() => {
     const config = {
@@ -707,6 +775,20 @@ export default function WorldMap(): JSX.Element {
   }, [gameScene, players]);
 
   useEffect(() => {
+    gameScene?.updatePlayersSongs(players);
+  }, [gameScene, players]);
+
+  useEffect(() => {
+    const songChangeDispatcher = (player: Player) => {
+      gameScene?.updatePlayerSong(player);
+    };
+    playerSongCallbacks.push(songChangeDispatcher);
+    return () => {
+      playerSongCallbacks.splice(playerSongCallbacks.indexOf(songChangeDispatcher), 1);
+    };
+  }, [gameScene, playerSongCallbacks]);
+
+  useEffect(() => {
     gameScene?.updateConversationAreas(conversationAreas);
   }, [conversationAreas, gameScene]);
 
@@ -737,9 +819,12 @@ export default function WorldMap(): JSX.Element {
   }, [video, newConversation, setNewConversation]);
 
   return (
-    <>
+    <div id='app-container'>
       {newConversationModal}
       <div id='map-container' />
-    </>
+      <div id='social-container'>
+        <SocialSidebar />
+      </div>
+    </div>
   );
 }

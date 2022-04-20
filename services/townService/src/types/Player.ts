@@ -3,6 +3,19 @@ import { ServerConversationArea } from '../client/TownsServiceClient';
 import { UserLocation } from '../CoveyTypes';
 
 /**
+ * The format of a Spotify song, with the display title (title and artist), 
+ * Spotify song uris, and progression (timestamp) in milliseconds
+ */
+export interface SongData {
+  /** The display title for the song * */
+  displayTitle: string;
+  /** The Spotify uris associated with the song */
+  uris: Array<string>;
+  /** The progress (timestamp) in the song, in ms */
+  progress: number;
+}
+
+/**
  * Each user who is connected to a town is represented by a Player object
  */
 export default class Player {
@@ -17,6 +30,9 @@ export default class Player {
 
   /** The current ConversationArea that the player is in, or undefined if they are not located within one */
   private _activeConversationArea?: ServerConversationArea;
+
+  /** The SongData describing the current song which a user is playing */
+  private _song?: SongData;
 
   constructor(userName: string) {
     this.location = {
@@ -43,6 +59,14 @@ export default class Player {
 
   set activeConversationArea(conversationArea: ServerConversationArea | undefined) {
     this._activeConversationArea = conversationArea;
+  }
+
+  get spotifySong(): SongData | undefined {
+    return this._song;
+  }
+
+  set spotifySong(song: SongData | undefined) {
+    this._song = song;
   }
 
   /**
