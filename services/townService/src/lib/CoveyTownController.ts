@@ -91,10 +91,18 @@ export default class CoveyTownController {
     if (controller._players && controller.coveyTownID) {
       controller._players.forEach(async player => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(controller.coveyTownID, player);
-        if (!(currentPlayingSong?.displayTitle == player.spotifySong?.displayTitle
-          && currentPlayingSong?.progress == player.spotifySong?.progress)) {
+        const playbackState = await SpotifyClient.getPlaybackState(controller.coveyTownID, player);
+
+        const songIsPlaying = playbackState?.isPlaying;
+        console.log(songIsPlaying);
+        
+        if (!songIsPlaying) {
+          player.spotifySong = undefined;
+        }
+        else {
           player.spotifySong = currentPlayingSong ? currentPlayingSong : undefined;
         }
+        
         if (controller._listeners) {
           controller._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
