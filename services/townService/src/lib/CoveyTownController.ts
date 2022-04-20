@@ -88,8 +88,6 @@ export default class CoveyTownController {
 
   updatePlayerSongs(controller: CoveyTownController)
   {
-    console.log("working")
-    console.log(`${controller._players}, ${controller.coveyTownID}, ${controller._listeners}`);
     if (controller._players && controller.coveyTownID) {
       controller._players.forEach(async player => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(controller.coveyTownID, player);

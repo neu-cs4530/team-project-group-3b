@@ -16,6 +16,14 @@ export interface SongData {
 }
 
 /**
+ * The format of the Spotify user’s current playback state.
+ */
+export interface PlaybackState {
+  /** true if something is currently playing */
+  isPlaying: boolean;
+}
+
+/**
  * Each user who is connected to a town is represented by a Player object
  */
 export default class Player {

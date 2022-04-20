@@ -2,7 +2,7 @@
 import assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
-import Player, { SongData } from '../types/Player';
+import Player, { PlaybackState, SongData } from '../types/Player';
 
 dotenv.config();
 
@@ -276,6 +276,29 @@ export default class SpotifyClient {
       console.log(err);
       return false;
     }
+  }
+
+  public static async getPlaybackState(coveyTownID: string, player: Player): Promise<PlaybackState | undefined> {
+    const playbackStateInfo = 
+    await SpotifyClient.getSpotifyAPICallResponse('https://api.spotify.com/v1/me/player',
+      coveyTownID, 
+      player);
+
+    if (playbackStateInfo) {
+      const playbackStateJsonData = await playbackStateInfo.data;
+
+      if (playbackStateJsonData.item) {
+        const isPlaying = await playbackStateJsonData.item.is_playing;
+
+        const playbackStateData: PlaybackState = {
+          isPlaying: isPlaying,
+        };
+        
+        return playbackStateData;
+      }
+    }
+    
+    return undefined;
   }
   
 }
