@@ -2,7 +2,7 @@
 import assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
-import Player, { SongData } from '../types/Player';
+import Player, { PlaybackState, SongData } from '../types/Player';
 
 dotenv.config();
 
@@ -106,7 +106,7 @@ export default class SpotifyClient {
         },
       });
     
-      console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
+      // console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
       return response;
     } catch (err) {
       console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
@@ -260,22 +260,50 @@ export default class SpotifyClient {
     const playerToken = SpotifyClient.getTokenForTownPlayer(coveyTownID, player);
 
     try {
-      await axios.put('https://api.spotify.com/v1/me/player/play', { 
-        headers: { 
-          'Authorization': `Bearer ${playerToken}`,
-          'Content-Type': 'application/json',
-        },
-        json: {
+      await axios.put('https://api.spotify.com/v1/me/player/play', 
+        {
           'uris': songData.uris,
           'progress_ms': songData.progress,
         },
-      });
+        { 
+          headers:
+            {
+              'Authorization': `Bearer ${playerToken}`,
+              'Content-Type': 'application/json',
+            },
+        },
+      );
     
       return true;
     } catch (err) {
       console.log(err);
       return false;
     }
+  }
+
+  public static async getPlaybackState(coveyTownID: string, player: Player): Promise<PlaybackState | undefined> {
+    // scope = 'user-read-playback-state'
+    
+    const playbackStateInfo = 
+    await SpotifyClient.getSpotifyAPICallResponse('https://api.spotify.com/v1/me/player',
+      coveyTownID, 
+      player);
+
+    if (playbackStateInfo) {
+      const playbackStateJsonData = await playbackStateInfo.data;
+
+      if (playbackStateJsonData.item) {
+        const isPlaying = await playbackStateJsonData.is_playing;
+
+        const playbackStateData: PlaybackState = {
+          isPlaying,
+        };
+        
+        return playbackStateData;
+      }
+    }
+    
+    return undefined;
   }
   
 }

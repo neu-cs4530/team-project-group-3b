@@ -14,7 +14,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import './App.css';
 import ConversationArea, { ServerConversationArea } from './classes/ConversationArea';
-import Player, { ServerPlayer, UserLocation } from './classes/Player';
+import Player, { ServerPlayer, SongData, UserLocation } from './classes/Player';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import Video from './classes/Video/Video';
 import Login from './components/Login/Login';
@@ -38,6 +38,7 @@ import VideoContext from './contexts/VideoContext';
 import { CoveyAppState } from './CoveyTypes';
 
 export const MOVEMENT_UPDATE_DELAY_MS = 0;
+export const SONG_UPDATE_DELAY_MS = 0;
 export const CALCULATE_NEARBY_PLAYERS_MOVING_DELAY_MS = 300;
 type CoveyAppUpdate =
   | {
@@ -51,6 +52,7 @@ type CoveyAppUpdate =
         myPlayerID: string;
         socket: Socket;
         emitMovement: (location: UserLocation) => void;
+        emitSongRequest: (songData: SongData) => void;
       };
     }
   | { action: 'disconnect' };
@@ -65,6 +67,7 @@ function defaultAppState(): CoveyAppState {
     userName: '',
     socket: null,
     emitMovement: () => {},
+    emitSongRequest: () => {},
     apiClient: new TownsServiceClient(),
   };
 }
@@ -78,6 +81,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     userName: state.userName,
     socket: state.socket,
     emitMovement: state.emitMovement,
+    emitSongRequest: state.emitSongRequest,
     apiClient: state.apiClient,
   };
 
@@ -90,6 +94,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.currentTownIsPubliclyListed = update.data.townIsPubliclyListed;
       nextState.userName = update.data.userName;
       nextState.emitMovement = update.data.emitMovement;
+      nextState.emitSongRequest = update.data.emitSongRequest;
       nextState.socket = update.data.socket;
       break;
     case 'disconnect':
@@ -149,6 +154,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         dispatchAppUpdate({ action: 'disconnect' });
       });
       let lastMovement = 0;
+      let lastSongChange = 0;
       let lastRecalculateNearbyPlayers = 0;
       let currentLocation: UserLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
 
@@ -183,6 +189,13 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       };
+      const emitSongRequest = (songData: SongData) => {
+        const now = Date.now();
+        if (now - lastSongChange > SONG_UPDATE_DELAY_MS) {
+          lastSongChange = now;
+          socket.emit('playerSongRequest', songData);
+        }
+      }
       socket.on('newPlayer', (player: ServerPlayer) => {
         localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
         setPlayersInTown(localPlayers); // 188: Added this here from the coveytown repo...is this fine?
@@ -263,6 +276,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           myPlayerID: gamePlayerID,
           townIsPubliclyListed: video.isPubliclyListed,
           emitMovement,
+          emitSongRequest,
           socket,
         },
       });

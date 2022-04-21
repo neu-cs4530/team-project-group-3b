@@ -10,7 +10,7 @@ import { Button, Tooltip } from '@chakra-ui/react';
 function spotifyFlow() {
   // const state = generateRandomString(16); // todo technically optional but recommended, removed for now
   // const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile user-read-email';
-  const scope = 'user-read-private user-read-email user-read-currently-playing';
+  const scope = 'user-read-private user-read-email user-read-currently-playing user-read-playback-state user-modify-playback-state';
 
   // console.log(process.env);
 
