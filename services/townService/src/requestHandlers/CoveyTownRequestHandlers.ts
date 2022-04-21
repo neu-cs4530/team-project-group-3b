@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
-import Player from '../types/Player';
+import Player, { SongData } from '../types/Player';
 import { ChatMessage, CoveyTownList, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
@@ -291,5 +291,9 @@ export function townSubscriptionHandler(socket: Socket): void {
   // location, inform the CoveyTownController
   socket.on('playerMovement', (movementData: UserLocation) => {
     townController.updatePlayerLocation(s.player, movementData);
+  });
+
+  socket.on('playerSongRequest', (songData: SongData) => {
+    townController.changePlayerSong(s.player, songData);
   });
 }

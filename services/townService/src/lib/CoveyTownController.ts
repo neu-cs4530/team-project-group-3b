@@ -2,7 +2,7 @@ import { customAlphabet, nanoid } from 'nanoid';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
-import Player from '../types/Player';
+import Player, { SongData } from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import IVideoClient from './IVideoClient';
 import SpotifyClient from './SpotifyClient';
@@ -191,6 +191,31 @@ export default class CoveyTownController {
     }
 
     this._listeners.forEach(listener => listener.onPlayerMoved(player));
+  }
+
+  /**
+   * Updates the song of a player within the town
+   * 
+   * Will update the song based on the provided song data, but the with a progress
+   * (timestamp) of 0, causing the song to play at the beginning.  Will also trigger
+   * a Spotify API call to change the song the user is listening to on Spotify.
+   * 
+   * @param player Player to update song for
+   * @param songData New song for the player
+   */
+  async changePlayerSong(player: Player, songData: SongData): Promise<void> {
+    const songFromStart = {
+      displayTitle: songData.displayTitle,
+      uris: songData.uris,
+      progress: 0,
+    };
+
+    const songChanged = await SpotifyClient.startUserPlayback(this.coveyTownID, player, songFromStart);
+
+    if (songChanged) {
+      player.spotifySong = songFromStart;
+      this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
+    }
   }
 
   /**

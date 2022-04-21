@@ -56,6 +56,8 @@ class CoveyGameScene extends Phaser.Scene {
 
   private emitMovement: (loc: UserLocation) => void;
 
+  private emitSongRequest: (song: SongData) => void;
+
   private currentConversationArea?: ConversationGameObjects;
 
   private infoTextBox?: Phaser.GameObjects.Text;
@@ -67,12 +69,14 @@ class CoveyGameScene extends Phaser.Scene {
   constructor(
     video: Video,
     emitMovement: (loc: UserLocation) => void,
+    emitSongRequest: (song: SongData) => void,
     setNewConversation: (conv: ConversationArea) => void,
     myPlayerID: string,
   ) {
     super('PlayGame');
     this.video = video;
     this.emitMovement = emitMovement;
+    this.emitSongRequest = emitSongRequest;
     this.myPlayerID = myPlayerID;
     this.setNewConversation = setNewConversation;
   }
@@ -164,6 +168,9 @@ class CoveyGameScene extends Phaser.Scene {
       
       myPlayer.songLabel?.setX(player.location.x);
       myPlayer.songLabel?.setY(player.location.y - 40);
+
+      myPlayer.songLabel?.setInteractive();
+      myPlayer.songLabel?.on('pointerdown', this.onSongLabelClicked, myPlayer.song);
     }
   }
 
@@ -191,6 +198,19 @@ class CoveyGameScene extends Phaser.Scene {
       this.players = this.players.filter(
         player => !disconnectedPlayers.find(p => p.id === player.id),
       );
+    }
+  }
+
+  onSongLabelClicked(song: SongData) {
+    const myPlayer = this.players.find(p => p.id === this.myPlayerID);
+    
+    console.log('ONSONGLABELCLICKED WAS CALLED');
+
+    if (myPlayer) {
+      myPlayer.song = song;
+
+      this.emitSongRequest(song);
+      console.log('PLAYER IS DEFINED');
     }
   }
 
@@ -247,6 +267,8 @@ class CoveyGameScene extends Phaser.Scene {
         myPlayer.label = label;
         myPlayer.sprite = sprite;
         myPlayer.songLabel = spotifyLabel;
+        myPlayer.songLabel.setInteractive();
+        myPlayer.songLabel?.on('pointerdown', this.onSongLabelClicked, myPlayer.song);
       }
       if (!sprite.anims) return;
       sprite.setX(player.location.x);
@@ -716,7 +738,7 @@ class CoveyGameScene extends Phaser.Scene {
 
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
-  const { emitMovement, myPlayerID } = useCoveyAppState();
+  const { emitMovement, emitSongRequest, myPlayerID } = useCoveyAppState();
   const conversationAreas = useConversationAreas();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [newConversation, setNewConversation] = useState<ConversationArea>();
@@ -745,7 +767,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, setNewConversation, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, emitSongRequest, setNewConversation, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -758,7 +780,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, setNewConversation, myPlayerID]);
+  }, [video, emitMovement, emitSongRequest, setNewConversation, myPlayerID]);
 
   useEffect(() => {
     const movementDispatcher = (player: ServerPlayer) => {
