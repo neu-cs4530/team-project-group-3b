@@ -32,7 +32,7 @@ describe('CoveyTownController', () => {
     const townController = new CoveyTownController(townName, false);
     expect(townController.friendlyName)
       .toBe(townName);
-      townController.cancelPlayerSongUpdates();
+    townController.cancelPlayerSongUpdates();
   });
   describe('addPlayer', () => { 
     it('should use the coveyTownID and player ID properties when requesting a video token',
