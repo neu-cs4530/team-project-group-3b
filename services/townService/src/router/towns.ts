@@ -194,7 +194,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     };
 
     try {
-      const tokenRequestResponse = await axios.post(spotifyUrl, data, { headers });
+      await axios.post(spotifyUrl, data, { headers });
       
       const result = {};
       res.status(StatusCodes.OK)
