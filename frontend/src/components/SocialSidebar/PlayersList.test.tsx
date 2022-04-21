@@ -145,6 +145,7 @@ describe('PlayersInTownList', () => {
       ]);
       usePlayersInTownSpy.mockReturnValue(newPlayers);
       renderData.rerender(wrappedPlayersListComponent());
+      // eslint-disable-next-line no-await-in-loop
       await expectProperlyRenderedPlayersList(renderData, newPlayers);
     }
   });
@@ -155,6 +156,7 @@ describe('PlayersInTownList', () => {
       const newPlayers = players.splice(i, 1);
       usePlayersInTownSpy.mockReturnValue(newPlayers);
       renderData.rerender(wrappedPlayersListComponent());
+      // eslint-disable-next-line no-await-in-loop
       await expectProperlyRenderedPlayersList(renderData, newPlayers);
     }
   });

@@ -61,6 +61,7 @@ describe('ConversationAreasList', () => {
           const { parentElement } = areaLabels[i];
           expect(parentElement).toBeDefined();
           if (parentElement) {
+            // eslint-disable-next-line no-await-in-loop
             const playerNodes = await findAllByRole(parentElement, 'listitem');
             const playerNames = playerNodes.map(node => node.textContent);
             const expectedNames = players[i].map(player => player.userName);
