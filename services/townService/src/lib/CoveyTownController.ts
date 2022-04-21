@@ -117,6 +117,12 @@ export default class CoveyTownController {
     this._intervalID = setInterval(CoveyTownController.updatePlayerSongs, 5000, this);
   }  
 
+  cancelPlayerSongUpdates() {
+    if (this._intervalID) {
+      clearInterval(this._intervalID);
+    }
+  }
+
   /**
    * Adds a player to this Covey Town, provisioning the necessary credentials for the
    * player, and returning them
