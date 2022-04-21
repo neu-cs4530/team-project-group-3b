@@ -295,7 +295,7 @@ export default class SpotifyClient {
         const isPlaying = await playbackStateJsonData.is_playing;
 
         const playbackStateData: PlaybackState = {
-          isPlaying: isPlaying,
+          isPlaying,
         };
         
         return playbackStateData;

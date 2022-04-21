@@ -164,12 +164,11 @@ class CoveyGameScene extends Phaser.Scene {
         color: '#000000',
         backgroundColor: '#ffffff',
       });
-      myPlayer.songLabel = spotifyLabel;
+      myPlayer.songLabel = spotifyLabel.setInteractive();
       
       myPlayer.songLabel?.setX(player.location.x);
       myPlayer.songLabel?.setY(player.location.y - 40);
 
-      myPlayer.songLabel?.setInteractive();
       myPlayer.songLabel?.on('pointerdown', this.onSongLabelClicked, myPlayer.song);
     }
   }
@@ -266,8 +265,7 @@ class CoveyGameScene extends Phaser.Scene {
         });
         myPlayer.label = label;
         myPlayer.sprite = sprite;
-        myPlayer.songLabel = spotifyLabel;
-        myPlayer.songLabel.setInteractive();
+        myPlayer.songLabel = spotifyLabel.setInteractive(new Phaser.Geom.Rectangle(0, 0, 128, 100), Phaser.Geom.Rectangle.Contains);
         myPlayer.songLabel?.on('pointerdown', this.onSongLabelClicked, myPlayer.song);
       }
       if (!sprite.anims) return;
