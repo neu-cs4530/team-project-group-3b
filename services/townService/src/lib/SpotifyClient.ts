@@ -106,7 +106,7 @@ export default class SpotifyClient {
         },
       });
     
-      console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
+      // console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
       return response;
     } catch (err) {
       console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
@@ -279,6 +279,8 @@ export default class SpotifyClient {
   }
 
   public static async getPlaybackState(coveyTownID: string, player: Player): Promise<PlaybackState | undefined> {
+    // scope = 'user-read-playback-state'
+    
     const playbackStateInfo = 
     await SpotifyClient.getSpotifyAPICallResponse('https://api.spotify.com/v1/me/player',
       coveyTownID, 
@@ -286,9 +288,10 @@ export default class SpotifyClient {
 
     if (playbackStateInfo) {
       const playbackStateJsonData = await playbackStateInfo.data;
+      console.log(playbackStateJsonData);
 
       if (playbackStateJsonData.item) {
-        const isPlaying = await playbackStateJsonData.item.is_playing;
+        const isPlaying = await playbackStateJsonData.is_playing;
 
         const playbackStateData: PlaybackState = {
           isPlaying: isPlaying,

@@ -97,9 +97,11 @@ export default class CoveyTownController {
         console.log(songIsPlaying);
         
         if (!songIsPlaying) {
+          console.log(player.userName + ' paused')
           player.spotifySong = undefined;
         }
         else {
+          console.log(player.userName + ' playing')
           player.spotifySong = currentPlayingSong ? currentPlayingSong : undefined;
         }
         
