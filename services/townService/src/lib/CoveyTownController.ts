@@ -94,14 +94,11 @@ export default class CoveyTownController {
         const playbackState = await SpotifyClient.getPlaybackState(controller.coveyTownID, player);
 
         const songIsPlaying = playbackState?.isPlaying;
-        console.log(songIsPlaying);
         
         if (!songIsPlaying) {
-          console.log(player.userName + ' paused')
           player.spotifySong = undefined;
         }
         else {
-          console.log(player.userName + ' playing')
           player.spotifySong = currentPlayingSong ? currentPlayingSong : undefined;
         }
         
