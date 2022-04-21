@@ -86,7 +86,7 @@ export default class CoveyTownController {
   /** user for recurring function calls */
   private _intervalID;
 
-  static updatePlayerSongs(controller: CoveyTownController) {
+  static updatePlayerSongs(controller: CoveyTownController): void {
     if (controller._players && controller.coveyTownID) {
       controller._players.forEach(async player => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(controller.coveyTownID, player);
@@ -103,7 +103,7 @@ export default class CoveyTownController {
         if (controller._listeners) {
           controller._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
-        console.log(player.spotifySong?.displayTitle);
+        // console.log(player.spotifySong?.displayTitle);
       });
     }
   }
@@ -152,7 +152,7 @@ export default class CoveyTownController {
       SpotifyClient.removeTownPlayerFromClient(this._coveyTownID, p);
     }
     this._players = this._players.filter(player => player.id !== session.player.id);
-    console.log(`players: ${this._players}`);
+    // console.log(`players: ${this._players}`);
     this._sessions = this._sessions.filter(s => s.sessionToken !== session.sessionToken);
     this._listeners.forEach(listener => listener.onPlayerDisconnected(session.player));
     const conversation = session.player.activeConversationArea;
