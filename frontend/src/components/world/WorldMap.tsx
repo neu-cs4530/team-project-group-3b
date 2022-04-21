@@ -164,12 +164,22 @@ class CoveyGameScene extends Phaser.Scene {
         color: '#000000',
         backgroundColor: '#ffffff',
       });
-      myPlayer.songLabel = spotifyLabel.setInteractive();
+      myPlayer.songLabel = spotifyLabel;
       
       myPlayer.songLabel?.setX(player.location.x);
       myPlayer.songLabel?.setY(player.location.y - 40);
 
-      myPlayer.songLabel?.on('pointerdown', this.onSongLabelClicked, myPlayer.song);
+      myPlayer.songLabel?.setInteractive({ useHandCursor: true })
+        .on('pointerover', () => myPlayer?.songLabel?.setStyle({ fill: '#0f0', backgroundColor: '#000000' }))
+        .on('pointerout', () => myPlayer?.songLabel?.setStyle({ fill: '#000000', backgroundColor: '#ffffff' }))
+        .on('pointerdown', () => {
+          if (myPlayer?.song) {
+            this.onSongLabelClicked(myPlayer.song);
+          }
+          
+          myPlayer?.songLabel?.setStyle({ fill: '#ff0000', backgroundColor: '#000000' })
+        })
+        .on('pointerup', () => myPlayer?.songLabel?.setStyle({ fill: '#0f0', backgroundColor: '#000000' }));
     }
   }
 
@@ -265,8 +275,18 @@ class CoveyGameScene extends Phaser.Scene {
         });
         myPlayer.label = label;
         myPlayer.sprite = sprite;
-        myPlayer.songLabel = spotifyLabel.setInteractive(new Phaser.Geom.Rectangle(0, 0, 128, 100), Phaser.Geom.Rectangle.Contains);
-        myPlayer.songLabel?.on('pointerdown', this.onSongLabelClicked, myPlayer.song);
+        myPlayer.songLabel = spotifyLabel;
+        myPlayer.songLabel?.setInteractive({ useHandCursor: true })
+          .on('pointerover', () => myPlayer?.songLabel?.setStyle({ fill: '#0f0', backgroundColor: '#000000' }))
+          .on('pointerout', () => myPlayer?.songLabel?.setStyle({ fill: '#000000', backgroundColor: '#ffffff' }))
+          .on('pointerdown', () => {
+            if (myPlayer?.song) {
+              this.onSongLabelClicked(myPlayer.song);
+            }
+            
+            myPlayer?.songLabel?.setStyle({ fill: '#ff0000', backgroundColor: '#000000' })
+          })
+          .on('pointerup', () => myPlayer?.songLabel?.setStyle({ fill: '#0f0', backgroundColor: '#000000' }));
       }
       if (!sprite.anims) return;
       sprite.setX(player.location.x);
@@ -275,6 +295,17 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer.label?.setY(player.location.y - 20);
       myPlayer.songLabel?.setX(player.location.x);
       myPlayer.songLabel?.setY(player.location.y - 40);
+      myPlayer.songLabel?.setInteractive({ useHandCursor: true })
+        .on('pointerover', () => myPlayer?.songLabel?.setStyle({ fill: '#0f0', backgroundColor: '#000000' }))
+        .on('pointerout', () => myPlayer?.songLabel?.setStyle({ fill: '#000000', backgroundColor: '#ffffff' }))
+        .on('pointerdown', () => {
+          if (myPlayer?.song) {
+            this.onSongLabelClicked(myPlayer.song);
+          }
+          
+          myPlayer?.songLabel?.setStyle({ fill: '#ff0000', backgroundColor: '#000000' })
+        })
+        .on('pointerup', () => myPlayer?.songLabel?.setStyle({ fill: '#0f0', backgroundColor: '#000000' }));
       if (player.location.moving) {
         sprite.anims.play(`misa-${player.location.rotation}-walk`, true);
       } else {
