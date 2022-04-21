@@ -259,19 +259,20 @@ export default class SpotifyClient {
 
     const playerToken = SpotifyClient.getTokenForTownPlayer(coveyTownID, player);
 
-    console.log('API WAS CALLED');
-
     try {
-      await axios.put('https://api.spotify.com/v1/me/player/play', { 
-        headers: { 
-          'Authorization': `Bearer ${playerToken}`,
-          'Content-Type': 'application/json',
-        },
-        json: {
+      await axios.put('https://api.spotify.com/v1/me/player/play', 
+        {
           'uris': songData.uris,
           'progress_ms': songData.progress,
         },
-      });
+        { 
+          headers:
+            {
+              'Authorization': `Bearer ${playerToken}`,
+              'Content-Type': 'application/json',
+            },
+        },
+      );
     
       return true;
     } catch (err) {
