@@ -59,6 +59,7 @@ export default class CoveyTownsStore {
   createTown(friendlyName: string, isPubliclyListed: boolean): CoveyTownController {
     const newTown = new CoveyTownController(friendlyName, isPubliclyListed);
     this._towns.push(newTown);
+    newTown.beginUpdatePlayerSongs();
     return newTown;
   }
 
@@ -99,6 +100,7 @@ export default class CoveyTownsStore {
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       this._towns = this._towns.filter(town => town !== existingTown);
       existingTown.disconnectAllPlayers();
+      existingTown.forceEndUpdatePlayerSongs();
       return true;
     }
     return false;

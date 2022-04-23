@@ -84,10 +84,10 @@ export default class CoveyTownController {
   private _capacity: number;
 
   /** user for recurring function calls */
-  private _intervalID;
+  private _intervalID: NodeJS.Timeout | undefined = undefined;
 
   updatePlayerSongs(): void {
-    if (this._players && this.coveyTownID) {
+    if (this.coveyTownID) {
       this._players.forEach(async player => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(this.coveyTownID, player);
         const playbackState = await SpotifyClient.getPlaybackState(this.coveyTownID, player);
@@ -106,6 +106,9 @@ export default class CoveyTownController {
         // console.log(player.spotifySong?.displayTitle);
       });
     }
+    if (this._players.length === 0 && this._intervalID) {
+      clearInterval(this._intervalID);
+    }
   }
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
@@ -115,7 +118,24 @@ export default class CoveyTownController {
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
     this.updatePlayerSongs = this.updatePlayerSongs.bind(this);
-    this._intervalID = setInterval(this.updatePlayerSongs, 5000);
+  }
+
+  /**
+   * If the timer does not exist, begins repeated calls to updatePlayerSongs.
+   */
+  public beginUpdatePlayerSongs(): void {
+    if (!this._intervalID) {
+      this._intervalID = setInterval(this.updatePlayerSongs, 1000);
+    }
+  }
+
+  /**
+   * If the timer exists, ends repeated calls to updatePlayerSongs.
+   */
+  public forceEndUpdatePlayerSongs(): void {
+    if (this._intervalID) {
+      clearInterval(this._intervalID);
+    }
   }
 
   /**
