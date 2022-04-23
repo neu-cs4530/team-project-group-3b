@@ -66,8 +66,6 @@ describe('CoveyTownsStore', () => {
       expect(firstTown.coveyTownID)
         .not
         .toBe(secondTown.coveyTownID);
-      firstTown.cancelPlayerSongUpdates();
-      secondTown.cancelPlayerSongUpdates();
     });
   });
 
@@ -80,7 +78,6 @@ describe('CoveyTownsStore', () => {
       expect(firstTown)
         .toBe(CoveyTownsStore.getInstance()
           .getControllerForTown(firstTown.coveyTownID));
-      firstTown.cancelPlayerSongUpdates();
     });
   });
 
@@ -96,7 +93,6 @@ describe('CoveyTownsStore', () => {
         .toBe(friendlyName);
       expect(town.isPubliclyListed)
         .toBe(false);
-      town.cancelPlayerSongUpdates();
     });
     it('Should fail if the townID does not exist', async () => {
       const town = createTownForTesting();
@@ -110,7 +106,6 @@ describe('CoveyTownsStore', () => {
         .toBe(friendlyName);
       expect(town.isPubliclyListed)
         .toBe(false);
-      town.cancelPlayerSongUpdates();
     });
     it('Should update the town parameters', async () => {
 
@@ -125,7 +120,6 @@ describe('CoveyTownsStore', () => {
         .toBe(true);
       expect(town.friendlyName)
         .toBe(friendlyName);
-      town.cancelPlayerSongUpdates();
 
       // Now try with just a name change
       const newFriendlyName = nanoid();
@@ -157,7 +151,6 @@ describe('CoveyTownsStore', () => {
         .deleteTown(town.coveyTownID, `${town.townUpdatePassword}*`);
       expect(res)
         .toBe(false);
-      town.cancelPlayerSongUpdates();
     });
     it('Should fail if the townID does not exist', async () => {
       const res = CoveyTownsStore.getInstance()
@@ -177,8 +170,6 @@ describe('CoveyTownsStore', () => {
         .toBe(0);
       expect(mockCoveyListenerTownDestroyed.mock.calls.length)
         .toBe(4);
-      
-      town.cancelPlayerSongUpdates();
     });
   });
 
@@ -194,8 +185,6 @@ describe('CoveyTownsStore', () => {
         .toBe(town.friendlyName);
       expect(entry[0].coveyTownID)
         .toBe(town.coveyTownID);
-
-      town.cancelPlayerSongUpdates();
     });
     it('Should include each CoveyTownID if there are multiple towns with the same friendlyName', async () => {
       const town = createTownForTesting(undefined, true);
@@ -219,10 +208,6 @@ describe('CoveyTownsStore', () => {
       } else {
         fail('Expected the coveyTownIDs to match the towns that were created');
       }
-
-      town.cancelPlayerSongUpdates();
-      secondTown.cancelPlayerSongUpdates();
-
     });
     it('Should not include private towns', async () => {
       const town = createTownForTesting(undefined, false);
@@ -231,8 +216,6 @@ describe('CoveyTownsStore', () => {
         .filter(townInfo => townInfo.friendlyName === town.friendlyName || townInfo.coveyTownID === town.coveyTownID);
       expect(towns.length)
         .toBe(0);
-
-      town.cancelPlayerSongUpdates();
     });
     it('Should not include private towns, even if there is a public town of same name', async () => {
       const town = createTownForTesting(undefined, false);
@@ -246,9 +229,6 @@ describe('CoveyTownsStore', () => {
         .toBe(town2.coveyTownID);
       expect(towns[0].friendlyName)
         .toBe(town2.friendlyName);
-
-      town.cancelPlayerSongUpdates();
-      town2.cancelPlayerSongUpdates();
     });
     it('Should not include deleted towns', async () => {
       const town = createTownForTesting(undefined, true);
@@ -266,8 +246,6 @@ describe('CoveyTownsStore', () => {
         .filter(townInfo => townInfo.friendlyName === town.friendlyName || townInfo.coveyTownID === town.coveyTownID);
       expect(townsPostDelete.length)
         .toBe(0);
-
-      town.cancelPlayerSongUpdates();
     });
   });
 });
