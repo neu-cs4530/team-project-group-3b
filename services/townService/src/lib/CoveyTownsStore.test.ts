@@ -66,6 +66,8 @@ describe('CoveyTownsStore', () => {
       expect(firstTown.coveyTownID)
         .not
         .toBe(secondTown.coveyTownID);
+      firstTown.forceEndUpdatePlayerSongs();
+      secondTown.forceEndUpdatePlayerSongs();
     });
   });
 
@@ -93,6 +95,7 @@ describe('CoveyTownsStore', () => {
         .toBe(friendlyName);
       expect(town.isPubliclyListed)
         .toBe(false);
+      town.forceEndUpdatePlayerSongs();
     });
     it('Should fail if the townID does not exist', async () => {
       const town = createTownForTesting();
@@ -151,6 +154,7 @@ describe('CoveyTownsStore', () => {
         .deleteTown(town.coveyTownID, `${town.townUpdatePassword}*`);
       expect(res)
         .toBe(false);
+      town.forceEndUpdatePlayerSongs();
     });
     it('Should fail if the townID does not exist', async () => {
       const res = CoveyTownsStore.getInstance()

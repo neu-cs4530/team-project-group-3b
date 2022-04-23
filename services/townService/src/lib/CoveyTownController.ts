@@ -84,7 +84,7 @@ export default class CoveyTownController {
   private _capacity: number;
 
   /** user for recurring function calls */
-  private _intervalID;
+  private _intervalID: NodeJS.Timeout|undefined = undefined;
 
   updatePlayerSongs(): void {
     if (this.coveyTownID) {
@@ -103,10 +103,10 @@ export default class CoveyTownController {
         if (this._listeners) {
           this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
-        // console.log(player.spotifySong?.displayTitle);
+        console.log(player.spotifySong?.displayTitle);
       });
     }
-    if (this._players.length === 0) {
+    if (this._players.length === 0 && this._intervalID) {
       // console.log('clearing');
       clearInterval(this._intervalID);
       // console.log('cleared');
@@ -120,7 +120,18 @@ export default class CoveyTownController {
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
     this.updatePlayerSongs = this.updatePlayerSongs.bind(this);
-    this._intervalID = setInterval(this.updatePlayerSongs, 1000);
+  }
+
+  public beginUpdatePlayerSongs() {
+    if (!this._intervalID) {
+      this._intervalID = setInterval(this.updatePlayerSongs, 1000);
+    }
+  }
+
+  public forceEndUpdatePlayerSongs() {
+    if (this._intervalID) {
+      clearInterval(this._intervalID);
+    }
   }
 
   /**
