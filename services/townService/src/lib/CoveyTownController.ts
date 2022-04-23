@@ -86,7 +86,7 @@ export default class CoveyTownController {
   /** user for recurring function calls */
   private _intervalID;
 
-  static updatePlayerSongs(controller: CoveyTownController): void {
+  static async updatePlayerSongs(controller: CoveyTownController): Promise<void> {
     if (controller._players && controller.coveyTownID) {
       controller._players.forEach(async player => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(controller.coveyTownID, player);
@@ -114,8 +114,8 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-    this._intervalID = setInterval(CoveyTownController.updatePlayerSongs, 5000, this);
-  }  
+    this._intervalID = setInterval(async () => { await CoveyTownController.updatePlayerSongs }, 5000, this);
+  }
 
   cancelPlayerSongUpdates() {
     if (this._intervalID) {
