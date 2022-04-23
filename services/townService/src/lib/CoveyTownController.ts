@@ -114,10 +114,10 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-    this._intervalID = setInterval(async () => { await CoveyTownController.updatePlayerSongs }, 5000, this);
+    this._intervalID = setInterval(async () => { await CoveyTownController.updatePlayerSongs; }, 5000, this);
   }
 
-  cancelPlayerSongUpdates() {
+  cancelPlayerSongUpdates(): void {
     if (this._intervalID) {
       clearInterval(this._intervalID);
     }
