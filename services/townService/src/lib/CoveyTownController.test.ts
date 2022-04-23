@@ -33,7 +33,6 @@ describe('CoveyTownController', () => {
     const townController = new CoveyTownController(townName, false);
     expect(townController.friendlyName)
       .toBe(townName);
-    townController.cancelPlayerSongUpdates();
   });
   describe('addPlayer', () => { 
     it('should use the coveyTownID and player ID properties when requesting a video token',
@@ -54,9 +53,6 @@ describe('CoveyTownController', () => {
       const townName = `town listeners and events tests ${nanoid()}`;
       testingTown = new CoveyTownController(townName, false);
       mockListeners.forEach(mockReset);
-    });
-    afterEach(() => {
-      testingTown.cancelPlayerSongUpdates();
     });
     it('should notify added listeners of player movement when updatePlayerLocation is called', async () => {
       const player = new Player('test player');
@@ -265,9 +261,6 @@ describe('CoveyTownController', () => {
       const townName = `addConversationArea test town ${nanoid()}`;
       testingTown = new CoveyTownController(townName, false);
     });
-    afterEach(() => {
-      testingTown.cancelPlayerSongUpdates();
-    });
     it('should add the conversation area to the list of conversation areas', ()=>{
       const newConversationArea = TestUtils.createConversationForTesting();
       const result = testingTown.addConversationArea(newConversationArea);
@@ -284,9 +277,6 @@ describe('CoveyTownController', () => {
     beforeEach(() => {
       const townName = `updatePlayerLocation test town ${nanoid()}`;
       testingTown = new CoveyTownController(townName, false);
-    });
-    afterEach(() => {
-      testingTown.cancelPlayerSongUpdates();
     });
     it('should respect the conversation area reported by the player userLocation.conversationLabel, and not override it based on the player\'s x,y location', async ()=>{
       const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
