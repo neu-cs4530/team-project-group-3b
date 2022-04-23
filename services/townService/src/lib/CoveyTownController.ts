@@ -87,7 +87,7 @@ export default class CoveyTownController {
   private _intervalID;
 
   updatePlayerSongs(): void {
-    if (this._players && this.coveyTownID) {
+    if (this.coveyTownID) {
       this._players.forEach(async player => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(this.coveyTownID, player);
         const playbackState = await SpotifyClient.getPlaybackState(this.coveyTownID, player);
@@ -106,6 +106,11 @@ export default class CoveyTownController {
         // console.log(player.spotifySong?.displayTitle);
       });
     }
+    if (this._players.length === 0) {
+      // console.log('clearing');
+      clearInterval(this._intervalID);
+      // console.log('cleared');
+    }
   }
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
@@ -115,7 +120,7 @@ export default class CoveyTownController {
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
     this.updatePlayerSongs = this.updatePlayerSongs.bind(this);
-    this._intervalID = setInterval(this.updatePlayerSongs, 5000);
+    this._intervalID = setInterval(this.updatePlayerSongs, 1000);
   }
 
   /**
