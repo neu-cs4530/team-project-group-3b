@@ -100,6 +100,7 @@ export default class CoveyTownsStore {
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       this._towns = this._towns.filter(town => town !== existingTown);
       existingTown.disconnectAllPlayers();
+      existingTown.forceEndUpdatePlayerSongs();
       return true;
     }
     return false;
