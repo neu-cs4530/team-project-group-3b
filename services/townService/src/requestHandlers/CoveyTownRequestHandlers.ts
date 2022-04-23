@@ -255,7 +255,7 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
  *
  * @param socket the Socket object that we will use to communicate with the player
  */
-export function townSubscriptionHandler(socket: Socket): void {
+export async function townSubscriptionHandler(socket: Socket): Promise<void> {
   // Parse the client's session token from the connection
   // For each player, the session token should be the same string returned by joinTownHandler
   const { token, coveyTownID } = socket.handshake.auth as { token: string; coveyTownID: string };
@@ -293,7 +293,7 @@ export function townSubscriptionHandler(socket: Socket): void {
     townController.updatePlayerLocation(s.player, movementData);
   });
 
-  socket.on('playerSongRequest', (songData: SongData) => {
-    townController.changePlayerSong(s.player, songData);
+  socket.on('playerSongRequest', async (songData: SongData) => {
+    await townController.changePlayerSong(s.player, songData);
   });
 }

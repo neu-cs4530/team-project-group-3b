@@ -10,6 +10,7 @@ import PlayerSession from '../types/PlayerSession';
 import { townSubscriptionHandler } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownsStore from './CoveyTownsStore';
 import * as TestUtils from '../client/TestUtils';
+import SpotifyClient from './SpotifyClient';
 
 const mockTwilioVideo = mockDeep<TwilioVideo>();
 jest.spyOn(TwilioVideo, 'getInstance').mockReturnValue(mockTwilioVideo);
@@ -149,37 +150,37 @@ describe('CoveyTownController', () => {
     });
     it('should reject connections with invalid town IDs by calling disconnect', async () => {
       TestUtils.setSessionTokenAndTownID(nanoid(), session.sessionToken, mockSocket);
-      townSubscriptionHandler(mockSocket);
+      await townSubscriptionHandler(mockSocket);
       expect(mockSocket.disconnect).toBeCalledWith(true);
     });
     it('should reject connections with invalid session tokens by calling disconnect', async () => {
       TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, nanoid(), mockSocket);
-      townSubscriptionHandler(mockSocket);
+      await townSubscriptionHandler(mockSocket);
       expect(mockSocket.disconnect).toBeCalledWith(true);
     });
     describe('with a valid session token', () => {
       it('should add a town listener, which should emit "newPlayer" to the socket when a player joins', async () => {
         TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-        townSubscriptionHandler(mockSocket);
+        await townSubscriptionHandler(mockSocket);
         await testingTown.addPlayer(player);
         expect(mockSocket.emit).toBeCalledWith('newPlayer', player);
       });
       it('should add a town listener, which should emit "playerMoved" to the socket when a player moves', async () => {
         TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-        townSubscriptionHandler(mockSocket);
+        await townSubscriptionHandler(mockSocket);
         testingTown.updatePlayerLocation(player, generateTestLocation());
         expect(mockSocket.emit).toBeCalledWith('playerMoved', player);
 
       });
       it('should add a town listener, which should emit "playerDisconnect" to the socket when a player disconnects', async () => {
         TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-        townSubscriptionHandler(mockSocket);
+        await townSubscriptionHandler(mockSocket);
         testingTown.destroySession(session);
         expect(mockSocket.emit).toBeCalledWith('playerDisconnect', player);
       });
       it('should add a town listener, which should emit "townClosing" to the socket and disconnect it when disconnectAllPlayers is called', async () => {
         TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-        townSubscriptionHandler(mockSocket);
+        await townSubscriptionHandler(mockSocket);
         testingTown.disconnectAllPlayers();
         expect(mockSocket.emit).toBeCalledWith('townClosing');
         expect(mockSocket.disconnect).toBeCalledWith(true);
@@ -187,7 +188,7 @@ describe('CoveyTownController', () => {
       describe('when a socket disconnect event is fired', () => {
         it('should remove the town listener for that socket, and stop sending events to it', async () => {
           TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-          townSubscriptionHandler(mockSocket);
+          await townSubscriptionHandler(mockSocket);
 
           // find the 'disconnect' event handler for the socket, which should have been registered after the socket was connected
           const disconnectHandler = mockSocket.on.mock.calls.find(call => call[0] === 'disconnect');
@@ -202,7 +203,7 @@ describe('CoveyTownController', () => {
         });
         it('should destroy the session corresponding to that socket', async () => {
           TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-          townSubscriptionHandler(mockSocket);
+          await townSubscriptionHandler(mockSocket);
 
           // find the 'disconnect' event handler for the socket, which should have been registered after the socket was connected
           const disconnectHandler = mockSocket.on.mock.calls.find(call => call[0] === 'disconnect');
@@ -210,7 +211,7 @@ describe('CoveyTownController', () => {
             disconnectHandler[1]();
             mockReset(mockSocket);
             TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-            townSubscriptionHandler(mockSocket);
+            await townSubscriptionHandler(mockSocket);
             expect(mockSocket.disconnect).toHaveBeenCalledWith(true);
           } else {
             fail('No disconnect handler registered');
@@ -220,7 +221,7 @@ describe('CoveyTownController', () => {
       });
       it('should forward playerMovement events from the socket to subscribed listeners', async () => {
         TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
-        townSubscriptionHandler(mockSocket);
+        await townSubscriptionHandler(mockSocket);
         const mockListener = mock<CoveyTownListener>();
         testingTown.addTownListener(mockListener);
         // find the 'playerMovement' event handler for the socket, which should have been registered after the socket was connected
@@ -232,6 +233,28 @@ describe('CoveyTownController', () => {
           expect(mockListener.onPlayerMoved).toHaveBeenCalledWith(player);
         } else {
           fail('No playerMovement handler registered');
+        }
+      });
+      it('should forward playerSongRequest events from the socket to subscribed listeners', async () => {
+        jest.spyOn(SpotifyClient, 'startUserPlayback').mockReturnValueOnce(new Promise(() => true));
+
+        TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
+        await townSubscriptionHandler(mockSocket);
+        const mockListener = mock<CoveyTownListener>();
+        testingTown.addTownListener(mockListener);
+        // find the 'playerSongRequest' event handler for the socket, which should have been registered after the socket was connected
+        const playerMovementHandler = mockSocket.on.mock.calls.find(call => call[0] === 'playerSongRequest');
+        if (playerMovementHandler && playerMovementHandler[1]) {
+          const newSong = {
+            displayTitle: `Random Title by ${Math.random()}`,
+            uris: [ `spotify:track${Math.random()}` ],
+            progress: Math.floor(Math.random() * 100),
+          };
+          player.spotifySong = newSong;
+          playerMovementHandler[1](newSong);
+          expect(mockListener.onPlayerSongUpdated).toHaveBeenCalledWith(player);
+        } else {
+          fail('No playerSongRequest handler registered');
         }
       });
     });
