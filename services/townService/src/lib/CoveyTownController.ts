@@ -84,7 +84,7 @@ export default class CoveyTownController {
   private _capacity: number;
 
   /** user for recurring function calls */
-  private _timeoutID;
+  private _intervalID;
 
   updatePlayerSongs(): void {
     if (this._players && this.coveyTownID) {
@@ -115,7 +115,7 @@ export default class CoveyTownController {
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
     this.updatePlayerSongs = this.updatePlayerSongs.bind(this);
-    this._timeoutID = setTimeout(this.updatePlayerSongs, 5000);
+    this._intervalID = setInterval(this.updatePlayerSongs, 5000);
   }
 
   /**
