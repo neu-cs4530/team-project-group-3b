@@ -30,7 +30,7 @@ jobs:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
           SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI }}
-        run: cd services/townService; npm install && npm run lint && npm test
+        run: cd services/townService; npm install && npm run lint && npm test -- --forceExit
 
       - name: Build and test frontend components
         run: cd frontend; npm install && npm run lint && npm test -- --detectOpenHandles
