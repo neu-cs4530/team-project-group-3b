@@ -1,2 +1,2 @@
 # Redirects from what the browser requests to what we serve
-happy-yonath-48157c.netlify.app/callback*              /callback
+https://happy-yonath-48157c.netlify.app/callback*              /callback
