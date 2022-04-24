@@ -130,7 +130,7 @@ export default class SpotifyClient {
       };
       playerToToken?.set(player, token);
     } catch {
-      throw new Error(`Error parsing token \"${spotifyToken}\"`);
+      throw new Error(`Error parsing token "${spotifyToken}"`);
     }
   }
 
