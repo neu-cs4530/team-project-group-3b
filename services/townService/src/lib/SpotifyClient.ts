@@ -79,7 +79,7 @@ export default class SpotifyClient {
           'Content-Type': 'application/json',
         },
       });
-    
+
       // console.log(`username: ${player.userName}, id: ${player.id}, token: ${playerToken}`);
       return response;
     } catch (err) {

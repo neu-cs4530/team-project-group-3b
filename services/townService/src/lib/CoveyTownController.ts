@@ -114,7 +114,6 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
-    this.updatePlayerSongs = this.updatePlayerSongs.bind(this);
   }
 
   /**
