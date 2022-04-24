@@ -104,7 +104,6 @@ export default class CoveyTownController {
           this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
 
-        console.log(player.spotifySong?.displayTitle);
       });
     }
     if (this._players.length === 0 && this._intervalID) {
@@ -174,7 +173,6 @@ export default class CoveyTownController {
       SpotifyClient.removeTownPlayerFromClient(this._coveyTownID, p);
     }
     this._players = this._players.filter(player => player.id !== session.player.id);
-    // console.log(`players: ${this._players}`);
     this._sessions = this._sessions.filter(s => s.sessionToken !== session.sessionToken);
     this._listeners.forEach(listener => listener.onPlayerDisconnected(session.player));
     const conversation = session.player.activeConversationArea;

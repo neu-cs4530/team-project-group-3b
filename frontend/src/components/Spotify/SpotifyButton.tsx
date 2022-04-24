@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import MenuItem from '@material-ui/core/MenuItem';
+import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { useLocation } from 'react-router-dom';
 // import axios from 'axios';
@@ -8,11 +7,7 @@ import { Button, Tooltip } from '@chakra-ui/react';
 // import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 function spotifyFlow() {
-  // const state = generateRandomString(16); // todo technically optional but recommended, removed for now
-  // const scope = 'user-read-playback-state user-modify-playback-state app-remote-control user-read-profile user-read-email';
   const scope = 'user-read-private user-read-email user-read-currently-playing user-read-playback-state user-modify-playback-state';
-
-  // console.log(process.env);
 
   assert(process.env.REACT_APP_SPOTIFY_CLIENT_ID,
     'Environmental variable SPOTIFY_CLIENT_ID must be set');
@@ -30,7 +25,6 @@ function spotifyFlow() {
   }).toString();
   
   window.location.replace(`https://accounts.spotify.com/authorize?${urlParams}`);
-  // TODO error handling maybe?
 }
 
 function isTokenExpired() {
@@ -45,7 +39,6 @@ function isTokenExpired() {
 }
 
 export default function SpotifyButton(): JSX.Element {
-  // const { apiClient } = useCoveyAppState();
   const now = new Date();
   
   // add new access token to local storage if on the end of a callback, based on given url params
@@ -81,7 +74,7 @@ export default function SpotifyButton(): JSX.Element {
 
   return (
     <Tooltip label={ callAuthFlow ? 'Click to Connect!' : 'Connected!' } placement='right' shouldWrapChildren>
-      <Button isDisabled={!callAuthFlow} colorScheme={ callAuthFlow ? 'gray' : 'green' } onClick={callAuthFlow ? spotifyFlow : () => { console.log('SpotifyButton: Token is live.') }}>
+      <Button isDisabled={!callAuthFlow} colorScheme={ callAuthFlow ? 'gray' : 'green' } onClick={callAuthFlow ? spotifyFlow : () => {}}>
         <Typography variant="body1">Login with Spotify</Typography>
       </Button>
     </Tooltip>

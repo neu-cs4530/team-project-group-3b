@@ -115,7 +115,6 @@ export default class TownsServiceClient {
     const baseURL = serviceURL || process.env.REACT_APP_TOWNS_SERVICE_URL;
     assert(baseURL);
     this._axios = axios.create({ baseURL });
-    this.requestSpotifyAuthorizationFlow = this.requestSpotifyAuthorizationFlow.bind(this);
   }
 
   static unwrapOrThrowError<T>(response: AxiosResponse<ResponseEnvelope<T>>, ignoreResponse = false): T {
@@ -157,9 +156,5 @@ export default class TownsServiceClient {
   async createConversation(requestData: ConversationCreateRequest) : Promise<void>{
     const responseWrapper = await this._axios.post(`/towns/${requestData.coveyTownID}/conversationAreas`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  }
-
-  async requestSpotifyAuthorizationFlow() : Promise<AxiosResponse>{
-    return this._axios.get(`/spotify/login`);
   }
 }

@@ -202,11 +202,9 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         recalculateNearbyPlayers();
       });
       socket.on('playerMoved', (player: ServerPlayer) => {
-        console.log('playerMoved');
         if (player._id !== gamePlayerID) {
           const now = Date.now();
           playerMovementCallbacks.forEach(cb => {
-            console.log(`callback called ${player._userName}`);
             cb(player)
           });
           if (
@@ -225,16 +223,12 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       });
-      // todo listen for playerSpotifySongUpdated
       socket.on('playerSongUpdated', (player: ServerPlayer) => {
         const updatePlayer = localPlayers.filter(p => p.id === player._id)[0];
         updatePlayer.song = player._song;
-        console.log(`song socket called ${updatePlayer.userName} ${updatePlayer.song}`);
         playerSpotifySongCallbacks.forEach(cb => {
-          console.log(`callback called ${updatePlayer.userName} ${updatePlayer.song}`);
           cb(updatePlayer)
         });
-        // setPlayersInTown(localPlayers);
       });
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {
         localPlayers = localPlayers.filter(player => player.id !== disconnectedPlayer._id);

@@ -153,10 +153,8 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   updatePlayerSong(player: Player) {
-    console.log(`update player song: ${player.userName} ${player.song?.displayTitle}`);
     const myPlayer = this.players.find(p => p.id === player.id);
     if (myPlayer && this.myPlayerID !== myPlayer.id && this.physics && player.location) {
-      console.log(`${myPlayer} && ${this.myPlayerID} !== ${myPlayer.id} && ${this.physics} && ${player.location}`);
       myPlayer.song = player.song;
       myPlayer.songLabel?.destroy();
       const spotifyLabel = this.add.text(0, 0, player.song?.displayTitle ? player.song.displayTitle : '', {

@@ -80,7 +80,7 @@ describe('ConversationAreasList', () => {
   };
 
   let useConversationAreasSpy: jest.SpyInstance<ConversationArea[], []>;
-  let consoleErrorSpy: jest.SpyInstance<void, [message?: any, ...optionalParms: any[]]>;
+  let consoleErrorSpy: jest.SpyInstance<void, [message?: any, ...optionalParms: any[]]>; // this is a linter warning given by the codebase to us
   let usePlayersInTownSpy: jest.SpyInstance<Player[], []>;
 
   let addListenerSpys: jest.SpyInstance<void, [listener: ConversationAreaListener]>[] = [];

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import dotenv from 'dotenv';
 import Player, { PlaybackState, SongData } from '../types/Player';
@@ -30,37 +28,13 @@ export default class SpotifyClient {
   private static _townsToPlayerMaps: Map<string, Map<Player, SpotifyToken>> 
   = new Map<string, Map<Player, SpotifyToken>>();
 
-  private _spotifyClientID: string;
-
-  private _spotifyClientSecret: string;
-
-  private _spotifyRedirectURI: string;
-
-  constructor(spotifyClientID: string,
-    spotifyClientSecret: string,
-    spotifyRedirectURI: string) {
+  constructor() {
     SpotifyClient._townsToPlayerMaps = new Map<string, Map<Player, SpotifyToken>>();
-
-    this._spotifyClientID = spotifyClientID;
-
-    this._spotifyClientSecret = spotifyClientSecret;
-
-    this._spotifyRedirectURI = spotifyRedirectURI;
   }
 
   public static getInstance(): SpotifyClient {
     if (!SpotifyClient._instance) {
-      assert(process.env.SPOTIFY_CLIENT_ID,
-        'Environmental variable SPOTIFY_CLIENT_ID must be set');
-      assert(process.env.SPOTIFY_CLIENT_SECRET,
-        'Environmental variable SPOTIFY_CLIENT_SECRET must be set');
-      assert(process.env.SPOTIFY_REDIRECT_URI,
-        'Environmental variable SPOTIFY_REDIRECT_URI must be set');
-      SpotifyClient._instance = new SpotifyClient(
-        process.env.SPOTIFY_CLIENT_ID,
-        process.env.SPOTIFY_CLIENT_SECRET,
-        process.env.SPOTIFY_REDIRECT_URI,
-      );
+      SpotifyClient._instance = new SpotifyClient();
     }
     return SpotifyClient._instance;
   }

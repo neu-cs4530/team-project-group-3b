@@ -33,7 +33,7 @@ describe('PlayersInTownList', () => {
     uris: [],
     progress: -1,
   }
-  let consoleErrorSpy: jest.SpyInstance<void, [message?: any, ...optionalParms: any[]]>;
+  let consoleErrorSpy: jest.SpyInstance<void, [message?: any, ...optionalParms: any[]]>;  // this is a linter warning given by the codebase to us
   let usePlayersInTownSpy: jest.SpyInstance<Player[], []>;
   let useCoveyAppStateSpy: jest.SpyInstance<CoveyAppState, []>;
   let players: Player[] = [];
