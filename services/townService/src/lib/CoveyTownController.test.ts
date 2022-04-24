@@ -12,6 +12,8 @@ import CoveyTownsStore from './CoveyTownsStore';
 import * as TestUtils from '../client/TestUtils';
 import SpotifyClient from './SpotifyClient';
 
+jest.useFakeTimers();
+
 const mockTwilioVideo = mockDeep<TwilioVideo>();
 jest.spyOn(TwilioVideo, 'getInstance').mockReturnValue(mockTwilioVideo);
 
