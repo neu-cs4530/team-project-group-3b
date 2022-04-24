@@ -11,6 +11,8 @@ import * as requestHandlers from '../requestHandlers/CoveyTownRequestHandlers';
 import { createConversationForTesting } from './TestUtils';
 import TownsServiceClient, { ServerConversationArea } from './TownsServiceClient';
 
+jest.useFakeTimers();
+
 type TestTownData = {
   friendlyName: string;
   coveyTownID: string;
