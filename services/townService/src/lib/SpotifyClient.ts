@@ -122,12 +122,16 @@ export default class SpotifyClient {
   static addTownPlayerToClient(coveyTownID: string, player: Player, spotifyToken: string): void {
     const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
-    const tokenJson = JSON.parse(spotifyToken);
-    const token: SpotifyToken = {
-      accessToken: tokenJson.access_token,
-      expiry: tokenJson.expiry,
-    };
-    playerToToken?.set(player, token);
+    try {
+      const tokenJson = JSON.parse(spotifyToken);
+      const token: SpotifyToken = {
+        accessToken: tokenJson.access_token,
+        expiry: tokenJson.expiry,
+      };
+      playerToToken?.set(player, token);
+    } catch {
+      throw new Error(`Error parsing token \"${spotifyToken}\"`);
+    }
   }
 
   /**

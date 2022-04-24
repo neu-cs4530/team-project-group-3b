@@ -200,6 +200,22 @@ describe('TownsServiceAPIREST', () => {
   });
 
   describe('CoveyMemberAPI', () => {
+    it('Throws an error when a user attempts login with a malformed json object to a valid town', async () => {
+      const pubTown1 = await createTownForTesting(undefined, true);
+      try{
+        await apiClient.joinTown({
+          userName: nanoid(),
+          coveyTownID: pubTown1.coveyTownID,
+          spotifySessionToken: "this will cause an error",
+        });
+        fail('Expected an error to be thrown by joinTown but none thrown');
+      } catch (err) {
+        // OK, expected an error
+        // TODO this should really check to make sure it's the *right* error, but we didn't specify
+        // the format of the exception :(
+        // (same test format as one provided)
+      }
+    });
     it('Throws an error if the town does not exist', async () => {
       await createTownForTesting(undefined, true);
       try {
@@ -227,6 +243,25 @@ describe('TownsServiceAPIREST', () => {
       const res2 = await apiClient.joinTown({
         userName: nanoid(),
         coveyTownID: privTown1.coveyTownID,
+      });
+      expect(res2.coveySessionToken).toBeDefined();
+      expect(res2.coveyUserID).toBeDefined();
+    });
+    it('Admits a user with token to a valid public or private town', async () => {
+      const pubTown1 = await createTownForTesting(undefined, true);
+      const privTown1 = await createTownForTesting(undefined, false);
+      const res = await apiClient.joinTown({
+        userName: nanoid(),
+        coveyTownID: pubTown1.coveyTownID,
+        spotifySessionToken: "{\"access_token\":\"token\",\"expiry\":1650823623553}",
+      });
+      expect(res.coveySessionToken).toBeDefined();
+      expect(res.coveyUserID).toBeDefined();
+
+      const res2 = await apiClient.joinTown({
+        userName: nanoid(),
+        coveyTownID: privTown1.coveyTownID,
+        spotifySessionToken: "{\"access_token\":\"token\",\"expiry\":1650823623553}",
       });
       expect(res2.coveySessionToken).toBeDefined();
       expect(res2.coveyUserID).toBeDefined();
