@@ -103,11 +103,8 @@ export default class CoveyTownController {
         if (this._listeners) {
           this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
-
+        // console.log(currentPlayingSong?.displayTitle);
       });
-    }
-    if (this._players.length === 0 && this._intervalID) {
-      clearInterval(this._intervalID);
     }
   }
 
