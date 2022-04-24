@@ -5,6 +5,8 @@ import Player from '../types/Player';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage } from '../CoveyTypes';
 
+jest.useFakeTimers();
+
 const mockCoveyListenerTownDestroyed = jest.fn();
 const mockCoveyListenerOtherFns = jest.fn();
 
@@ -253,4 +255,3 @@ describe('CoveyTownsStore', () => {
     });
   });
 });
-

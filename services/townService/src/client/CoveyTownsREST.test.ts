@@ -7,6 +7,8 @@ import { AddressInfo } from 'net';
 import addTownRoutes from '../router/towns';
 import TownsServiceClient, { TownListResponse } from './TownsServiceClient';
 
+jest.useFakeTimers();
+
 type TestTownData = {
   friendlyName: string;
   coveyTownID: string;
@@ -202,11 +204,11 @@ describe('TownsServiceAPIREST', () => {
   describe('CoveyMemberAPI', () => {
     it('Throws an error when a user attempts login with a malformed json object to a valid town', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
-      try{
+      try {
         await apiClient.joinTown({
           userName: nanoid(),
           coveyTownID: pubTown1.coveyTownID,
-          spotifySessionToken: "this will cause an error",
+          spotifySessionToken: 'this will cause an error',
         });
         fail('Expected an error to be thrown by joinTown but none thrown');
       } catch (err) {
@@ -253,7 +255,7 @@ describe('TownsServiceAPIREST', () => {
       const res = await apiClient.joinTown({
         userName: nanoid(),
         coveyTownID: pubTown1.coveyTownID,
-        spotifySessionToken: "{\"access_token\":\"token\",\"expiry\":1650823623553}",
+        spotifySessionToken: '{"access_token":"token","expiry":1650823623553}',
       });
       expect(res.coveySessionToken).toBeDefined();
       expect(res.coveyUserID).toBeDefined();
@@ -261,7 +263,7 @@ describe('TownsServiceAPIREST', () => {
       const res2 = await apiClient.joinTown({
         userName: nanoid(),
         coveyTownID: privTown1.coveyTownID,
-        spotifySessionToken: "{\"access_token\":\"token\",\"expiry\":1650823623553}",
+        spotifySessionToken: '{"access_token":"token","expiry":1650823623553}',
       });
       expect(res2.coveySessionToken).toBeDefined();
       expect(res2.coveyUserID).toBeDefined();
