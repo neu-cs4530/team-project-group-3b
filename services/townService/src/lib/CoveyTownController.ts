@@ -103,7 +103,8 @@ export default class CoveyTownController {
         if (this._listeners) {
           this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
-        // console.log(player.spotifySong?.displayTitle);
+
+        console.log(player.spotifySong?.displayTitle);
       });
     }
     if (this._players.length === 0 && this._intervalID) {
@@ -125,7 +126,7 @@ export default class CoveyTownController {
    */
   public beginUpdatePlayerSongs(): void {
     if (!this._intervalID) {
-      this._intervalID = setInterval(this.updatePlayerSongs, 1000);
+      this._intervalID = setInterval(this.updatePlayerSongs.bind(this), 5000);
     }
   }
 

@@ -212,14 +212,11 @@ class CoveyGameScene extends Phaser.Scene {
 
   onSongLabelClicked(song: SongData) {
     const myPlayer = this.players.find(p => p.id === this.myPlayerID);
-    
-    console.log('ONSONGLABELCLICKED WAS CALLED');
 
     if (myPlayer) {
       myPlayer.song = song;
 
       this.emitSongRequest(song);
-      console.log('PLAYER IS DEFINED');
     }
   }
 
