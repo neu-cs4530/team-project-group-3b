@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import dotenv from 'dotenv';
 import Player, { PlaybackState, SongData } from '../types/Player';
 
@@ -69,7 +69,7 @@ export default class SpotifyClient {
    */
   private static async getSpotifyAPICallResponse(apiURL: string, 
     coveyTownID: string, 
-    player: Player): Promise<AxiosResponse<any> | undefined> {
+    player: Player) {
     const playerToken = SpotifyClient.getTokenForTownPlayer(coveyTownID, player);
 
     try {
