@@ -234,22 +234,22 @@ describe('CoveyTownController', () => {
         }
       });
       it('should forward playerSongRequest events from the socket to subscribed listeners', async () => {
-        jest.spyOn(SpotifyClient, 'startUserPlayback').mockReturnValueOnce(new Promise(() => true));
+        jest.spyOn(SpotifyClient, 'startUserPlayback').mockResolvedValueOnce(true);
 
         TestUtils.setSessionTokenAndTownID(testingTown.coveyTownID, session.sessionToken, mockSocket);
         await townSubscriptionHandler(mockSocket);
         const mockListener = mock<CoveyTownListener>();
         testingTown.addTownListener(mockListener);
         // find the 'playerSongRequest' event handler for the socket, which should have been registered after the socket was connected
-        const playerMovementHandler = mockSocket.on.mock.calls.find(call => call[0] === 'playerSongRequest');
-        if (playerMovementHandler && playerMovementHandler[1]) {
+        const playerSongRequestHandler = mockSocket.on.mock.calls.find(call => call[0] === 'playerSongRequest');
+        if (playerSongRequestHandler && playerSongRequestHandler[1]) {
           const newSong = {
             displayTitle: `Random Title by ${Math.random()}`,
             uris: [ `spotify:track${Math.random()}` ],
             progress: Math.floor(Math.random() * 100),
           };
           player.spotifySong = newSong;
-          playerMovementHandler[1](newSong);
+          await playerSongRequestHandler[1](newSong);
           expect(mockListener.onPlayerSongUpdated).toHaveBeenCalledWith(player);
         } else {
           fail('No playerSongRequest handler registered');
