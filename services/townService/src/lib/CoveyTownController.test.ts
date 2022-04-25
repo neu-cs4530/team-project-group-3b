@@ -17,6 +17,9 @@ jest.useFakeTimers();
 const mockTwilioVideo = mockDeep<TwilioVideo>();
 jest.spyOn(TwilioVideo, 'getInstance').mockReturnValue(mockTwilioVideo);
 
+const mockSpotifyClient = mockDeep<SpotifyClient>();
+jest.spyOn(SpotifyClient, 'getInstance').mockReturnValue(mockSpotifyClient);
+
 function generateTestLocation(): UserLocation {
   return {
     rotation: 'back',
@@ -299,7 +302,6 @@ describe('CoveyTownController', () => {
 
     }); 
     it('should emit an onConversationUpdated event when a conversation area gets a new occupant', async () =>{
-
       const newConversationArea = TestUtils.createConversationForTesting({ boundingBox: { x: 10, y: 10, height: 5, width: 5 } });
       const result = testingTown.addConversationArea(newConversationArea);
       expect(result).toBe(true);
@@ -312,6 +314,20 @@ describe('CoveyTownController', () => {
       const newLocation:UserLocation = { moving: false, rotation: 'front', x: 25, y: 25, conversationLabel: newConversationArea.label };
       testingTown.updatePlayerLocation(player, newLocation);
       expect(mockListener.onConversationAreaUpdated).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('updatePlayerSongs', () => {
+    let testingTown: CoveyTownController;
+    let player1: Player;
+    let player2: Player;
+    beforeEach(() => {
+      const townName = `updatePlayerSongs test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+      player1 = new Player('test player 1');
+      player2 = new Player('test player 2');
+    });
+    it('should da da da', async () => {
+      
     });
   });
 });
