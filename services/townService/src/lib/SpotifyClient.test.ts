@@ -143,43 +143,41 @@ const getCPSData = { data: {
 } };
 
 describe('SpotifyClient', () => {
-  beforeEach(() => {
+  const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
+  const townName = `FriendlyNameTest1-${nanoid()}`;
+  let player1 : Player;
+  let townController : CoveyTownController;
+  beforeEach(async () => {
     /* before each */
     SpotifyClient.getInstance();
+    player1 = new Player(nanoid());
+    townController = new CoveyTownController(townName, false);
+    await townController.addPlayer(player1);
+    SpotifyClient.addTownToClient(townController.coveyTownID);
   });
-  /* it('should add players from different towns to the same map on player add-to-town', async () => {
-    const mockAddTownPlayerToClient = jest.fn();
-    SpotifyClient.addTownPlayerToClient = mockAddTownPlayerToClient;
-    const townName1 = `FriendlyNameTest1-${nanoid()}`;
-    const townController1 = new CoveyTownController(townName1, false);
+  it('should add players from different towns to the same map for a singly SpotifyClient on player add-to-town', async () => {
     const townName2 = `FriendlyNameTest2-${nanoid()}`;
     const townController2 = new CoveyTownController(townName2, false);
-    const player1 = new Player(nanoid());
-    const player2 = new Player(nanoid()); 
-    await townController1.addPlayer(player1);
+    const player2 = new Player(nanoid());
     await townController2.addPlayer(player2);
-    expect(mockAddTownPlayerToClient).toHaveBeenCalledTimes(2);
-  }); */
+    SpotifyClient.addTownToClient(townController2.coveyTownID);
+    SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
+    SpotifyClient.addTownPlayerToClient(townController2.coveyTownID, player2, testAuthToken);
+    const retrievedToken1 = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
+    expect(retrievedToken1).not.toBeUndefined();
+    const retrievedToken2 = SpotifyClient.getTokenForTownPlayer(townController2.coveyTownID, player2);
+    expect(retrievedToken2).not.toBeUndefined();
+    // Used the same auth token to add each player, so they should be the same !
+    expect(retrievedToken1).toEqual(retrievedToken2);
+  });
   describe('addTownPlayerToClient', () => {
     it('should add the specified town/player combo to _townsToPlayerMaps', async () => {
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
       expect(SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1)).toEqual('test_token');
     });
   });
   describe('removeTownPlayerFromClient', () => {
     it('should remove the specified town/player combo from _townsToPlayerMaps', async () => {
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
       expect(SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1)).toEqual('test_token');
       SpotifyClient.removeTownPlayerFromClient(townController.coveyTownID, player1);
@@ -188,35 +186,18 @@ describe('SpotifyClient', () => {
   });
   describe('getTokenForTownPlayer', () => {
     it('should return the proper token for a player after player is added to the town map', async () => {
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
       const retrievedToken = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
       expect(retrievedToken).toEqual('test_token');
     });
     it('should return undefined for players not in the town map', async () => {
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       const retrievedToken = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
       expect(retrievedToken).toBeUndefined();
     });
   });
   describe('town to client methods', () => {
-    const townName = `FriendlyNameTest1-${nanoid()}`;
-    const townController = new CoveyTownController(townName, false);
-    const player1 = new Player(nanoid());
-    const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
     describe('addTownToClient', () => {
       it('should successfully add the specified town to the SpotifyClient tracking map', async () => {
-        SpotifyClient.addTownToClient(townController.coveyTownID);
-        await townController.addPlayer(player1);
         SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
         const retrievedToken = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
         // If the town did not exist in the map, the return value of a token request would be undefined.
@@ -225,8 +206,6 @@ describe('SpotifyClient', () => {
     });
     describe('removeTownFromClient', () => {
       it('should successfully remove the specified town from the SC tracking map', async () => {
-        SpotifyClient.addTownToClient(townController.coveyTownID);
-        await townController.addPlayer(player1);
         SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
         const retrievedToken1 = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
         expect(retrievedToken1).not.toBeUndefined();
@@ -241,12 +220,6 @@ describe('SpotifyClient', () => {
     it('should successfully retrieve user data from the Spotify API', async () => {
       // Create a spy for GET, mock implementation to return spoofed data
       jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getUserData));
-      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
       await expect(SpotifyClient.getSpotifyUserID(townController.coveyTownID, player1)).resolves.toEqual('leecostich');
     });
@@ -255,12 +228,6 @@ describe('SpotifyClient', () => {
     it('should successfully retrieve current song data from the Spotify API', async () => {
       // Create a spy for GET, mock implementation to return spoofed data
       jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getCPSData));
-      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
       // Create a sample Song Data object using values we know should be in the spoofed API return
       const sampleSongData : SongData = { displayTitle: 'Bitch Where by Chief Keef',
@@ -275,12 +242,6 @@ describe('SpotifyClient', () => {
     it('should receive true when attempting PUT for startUserPlayback with valid parameters', async () => {
       // Create a spy for PUT, mock implementation to return spoofed data
       jest.spyOn(axios, 'put').mockImplementationOnce(() => Promise.resolve(true));
-      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
       // Create a sample Song Data object using values that are required for the method calling PUT
       const sampleSongData : SongData = { displayTitle: 'Bitch Where by Chief Keef',
@@ -296,12 +257,6 @@ describe('SpotifyClient', () => {
     it('should successfully retrieve the current playback state from the Spotify API', async () => {
       // Create a spy for GET, mock implementation to return spoofed data
       jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getCPSData));
-      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-      const player1 = new Player(nanoid());
-      const townName = `FriendlyNameTest1-${nanoid()}`;
-      const townController = new CoveyTownController(townName, false);
-      await townController.addPlayer(player1);
-      SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
       // Create a sample PlaybackState object using values we know should be in the spoofed API return
       const samplePlaybackState : PlaybackState = { isPlaying: true };
