@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import axios from 'axios';
 import { mock, mockDeep, mockReset } from 'jest-mock-extended';
-import Player, { SongData } from '../types/Player';
+import Player, { PlaybackState, SongData } from '../types/Player';
 import CoveyTownController from './CoveyTownController';
 import SpotifyClient from './SpotifyClient';
 import TwilioVideo from './TwilioVideo';
@@ -15,6 +15,35 @@ const mockSpotifyClient = mockDeep<SpotifyClient>();
 jest.spyOn(SpotifyClient, 'getInstance').mockReturnValue(mockSpotifyClient);
 
 jest.mock('axios');
+
+const getUserData = { data: {
+  'country': 'US',
+  'display_name': 'ec',
+  'email': 'leecostich@gmail.com',
+  'explicit_content': {
+    'filter_enabled': false,
+    'filter_locked': false,
+  },
+  'external_urls': {
+    'spotify': 'https://open.spotify.com/user/leecostich',
+  },
+  'followers': {
+    'href': null,
+    'total': 9,
+  },
+  'href': 'https://api.spotify.com/v1/users/leecostich',
+  'id': 'leecostich',
+  'images': [
+    {
+      'height': null,
+      'url': 'https://i.scdn.co/image/ab6775700000ee857af1d30308cbf00a46690537',
+      'width': null,
+    },
+  ],
+  'product': 'premium',
+  'type': 'user',
+  'uri': 'spotify:user:leecostich',
+} };
 
 const getCPSData = { data: {
   'timestamp': 1649900555682,
@@ -208,8 +237,23 @@ describe('SpotifyClient', () => {
       });
     });
   });
+  describe('getSpotifyUserID', () => {
+    it('should successfully retrieve user data from the Spotify API', async () => {
+      // Create a spy for GET, mock implementation to return spoofed data
+      jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getUserData));
+      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
+      const player1 = new Player(nanoid());
+      const townName = `FriendlyNameTest1-${nanoid()}`;
+      const townController = new CoveyTownController(townName, false);
+      await townController.addPlayer(player1);
+      SpotifyClient.addTownToClient(townController.coveyTownID);
+      SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
+      await expect(SpotifyClient.getSpotifyUserID(townController.coveyTownID, player1)).resolves.toEqual('leecostich');
+    });
+  });
   describe('getCurrentPlayingSong', () => {
     it('should successfully retrieve current song data from the Spotify API', async () => {
+      // Create a spy for GET, mock implementation to return spoofed data
       jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getCPSData));
       const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
       const player1 = new Player(nanoid());
@@ -218,11 +262,51 @@ describe('SpotifyClient', () => {
       await townController.addPlayer(player1);
       SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
+      // Create a sample Song Data object using values we know should be in the spoofed API return
       const sampleSongData : SongData = { displayTitle: 'Bitch Where by Chief Keef',
         uris: ['spotify:track:082PtKxlyQMemAnYZLSJMP'],
         progress: 3753,
       };
+      // Compare the Song Data objects of the mock API call and the sample
       await expect(SpotifyClient.getCurrentPlayingSong(townController.coveyTownID, player1)).resolves.toEqual(sampleSongData);
+    });
+  });
+  describe('startUserPlayback', () => {
+    it('should receive true when attempting PUT for startUserPlayback with valid parameters', async () => {
+      // Create a spy for PUT, mock implementation to return spoofed data
+      jest.spyOn(axios, 'put').mockImplementationOnce(() => Promise.resolve(true));
+      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
+      const player1 = new Player(nanoid());
+      const townName = `FriendlyNameTest1-${nanoid()}`;
+      const townController = new CoveyTownController(townName, false);
+      await townController.addPlayer(player1);
+      SpotifyClient.addTownToClient(townController.coveyTownID);
+      SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
+      // Create a sample Song Data object using values that are required for the method calling PUT
+      const sampleSongData : SongData = { displayTitle: 'Bitch Where by Chief Keef',
+        uris: ['spotify:track:082PtKxlyQMemAnYZLSJMP'],
+        progress: 3753,
+      };
+      // Look for TRUE as a response from PUT, which means that our method successfully formed the PUT request
+      // for the Spotify API
+      await expect(SpotifyClient.startUserPlayback(townController.coveyTownID, player1, sampleSongData)).resolves.toEqual(true);
+    });
+  });
+  describe('getPlaybackState', () => {
+    it('should successfully retrieve the current playback state from the Spotify API', async () => {
+      // Create a spy for GET, mock implementation to return spoofed data
+      jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getCPSData));
+      const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
+      const player1 = new Player(nanoid());
+      const townName = `FriendlyNameTest1-${nanoid()}`;
+      const townController = new CoveyTownController(townName, false);
+      await townController.addPlayer(player1);
+      SpotifyClient.addTownToClient(townController.coveyTownID);
+      SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
+      // Create a sample PlaybackState object using values we know should be in the spoofed API return
+      const samplePlaybackState : PlaybackState = { isPlaying: true };
+      // Compare the PlaybackState objects of the mock API call and the sample
+      await expect(SpotifyClient.getPlaybackState(townController.coveyTownID, player1)).resolves.toEqual(samplePlaybackState);
     });
   });
 });
