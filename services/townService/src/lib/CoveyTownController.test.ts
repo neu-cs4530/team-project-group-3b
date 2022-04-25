@@ -317,17 +317,50 @@ describe('CoveyTownController', () => {
     });
   });
   describe('updatePlayerSongs', () => {
+    jest.mock('./SpotifyClient');
     let testingTown: CoveyTownController;
     let player1: Player;
     let player2: Player;
-    beforeEach(() => {
+    beforeEach(async () => {
       const townName = `updatePlayerSongs test town ${nanoid()}`;
       testingTown = new CoveyTownController(townName, false);
       player1 = new Player('test player 1');
       player2 = new Player('test player 2');
+
+      SpotifyClient.addTownToClient(testingTown.coveyTownID);
+
+      await testingTown.addPlayer(player1);
+      await testingTown.addPlayer(player2);
+
+      SpotifyClient.addTownPlayerToClient(testingTown.coveyTownID, player1, '{"access_token":"test_token_1", "expiry":3600}');
+      SpotifyClient.addTownPlayerToClient(testingTown.coveyTownID, player2, '{"access_token":"test_token_2", "expiry":3600}');
     });
-    it('should da da da', async () => {
-      
+    afterEach(() => {
+      jest.clearAllMocks();
     });
+    it('should call getCurrentPlayingSong the proper number of times', async () => {
+      const spiedOnMethod = jest.spyOn(SpotifyClient, 'getCurrentPlayingSong').mockResolvedValue(undefined);
+
+      testingTown.updatePlayerSongs();
+
+      expect(spiedOnMethod).toBeCalledTimes(2);
+
+      testingTown.updatePlayerSongs();
+
+      expect(spiedOnMethod).toBeCalledTimes(4);
+    });
+    /*
+    it('should call getPlaybackState the proper number of times', async () => {
+      const spiedOnMethod = jest.spyOn(SpotifyClient, 'getPlaybackState');// .mockResolvedValue({ isPlaying: true });
+
+      await testingTown.updatePlayerSongs();
+
+      expect(spiedOnMethod).toBeCalledTimes(2);
+
+      await testingTown.updatePlayerSongs();
+
+      expect(spiedOnMethod).toBeCalledTimes(4);
+    });
+    */
   });
 });
