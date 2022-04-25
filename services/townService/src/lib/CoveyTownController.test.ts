@@ -144,7 +144,7 @@ describe('CoveyTownController', () => {
     let session: PlayerSession;
     beforeEach(async () => {
       const townName = `connectPlayerSocket tests ${nanoid()}`;
-      testingTown = CoveyTownsStore.getInstance().createTown(townName, false);
+      testingTown = await CoveyTownsStore.getInstance().createTown(townName, false);
       mockReset(mockSocket);
       player = new Player('test player');
       session = await testingTown.addPlayer(player);
@@ -348,15 +348,14 @@ describe('CoveyTownController', () => {
     it('should call getCurrentPlayingSong the proper number of times', async () => {
       const spiedOnMethod = jest.spyOn(SpotifyClient, 'getCurrentPlayingSong').mockResolvedValue(undefined);
 
-      testingTown.updatePlayerSongs();
+      await testingTown.updatePlayerSongs();
 
       expect(spiedOnMethod).toBeCalledTimes(2);
 
-      testingTown.updatePlayerSongs();
+      await testingTown.updatePlayerSongs();
 
       expect(spiedOnMethod).toBeCalledTimes(4);
     });
-    /*
     it('should call getPlaybackState the proper number of times', async () => {
       const spiedOnMethod = jest.spyOn(SpotifyClient, 'getPlaybackState');// .mockResolvedValue({ isPlaying: true });
 
@@ -368,23 +367,19 @@ describe('CoveyTownController', () => {
 
       expect(spiedOnMethod).toBeCalledTimes(4);
     });
-    */
-    /*
     it('should update a player\'s song if a song is currently playing', async () => {
-      // jest.spyOn(SpotifyClient, 'getCurrentPlayingSong').mockRejectedValue(testSong);
-      // jest.spyOn(SpotifyClient, 'getPlaybackState').mockRejectedValue({ isPlaying: true });
       jest.spyOn(SpotifyClient, 'getCurrentPlayingSong').mockResolvedValue(testSong);
       jest.spyOn(SpotifyClient, 'getPlaybackState').mockResolvedValue({ isPlaying: true });
 
-      // expect(player1.spotifySong).toBeUndefined();
-      // expect(player2.spotifySong).toBeUndefined();
+      expect(player1.spotifySong).toBeUndefined();
+      expect(player2.spotifySong).toBeUndefined();
 
       await testingTown.updatePlayerSongs();
 
       expect(player1.spotifySong).toMatchObject(testSong);
-      // expect(player2.spotifySong).toMatchObject(testSong);
+
+      expect(player2.spotifySong).toMatchObject(testSong);
     });
-    */
     it('should set a player\'s song to undefined if no song is currently playing', async () => {
       jest.spyOn(SpotifyClient, 'getCurrentPlayingSong').mockResolvedValue(undefined);
       jest.spyOn(SpotifyClient, 'getPlaybackState').mockResolvedValue({ isPlaying: false });
@@ -392,7 +387,7 @@ describe('CoveyTownController', () => {
       expect(player1.spotifySong).toBeUndefined();
       expect(player2.spotifySong).toBeUndefined();
 
-      testingTown.updatePlayerSongs();
+      await testingTown.updatePlayerSongs();
 
       expect(player1.spotifySong).toBeUndefined();
       expect(player2.spotifySong).toBeUndefined();
@@ -404,7 +399,7 @@ describe('CoveyTownController', () => {
       expect(player1.spotifySong).toBeUndefined();
       expect(player2.spotifySong).toBeUndefined();
 
-      testingTown.updatePlayerSongs();
+      await testingTown.updatePlayerSongs();
 
       expect(player1.spotifySong).toBeUndefined();
       expect(player2.spotifySong).toBeUndefined();

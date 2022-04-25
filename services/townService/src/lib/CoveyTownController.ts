@@ -95,9 +95,10 @@ export default class CoveyTownController {
    * 
    * Dispatches onPlayerSongUpdated events after updating each player's song.
    */
-  updatePlayerSongs(): void {
+  async updatePlayerSongs(): Promise<void> {
     if (this.coveyTownID) {
-      this._players.forEach(async (player) => {
+      await Promise.all(this._players.map(async (player) => {
+
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(this.coveyTownID, player);
         const playbackState = await SpotifyClient.getPlaybackState(this.coveyTownID, player);
 
@@ -112,7 +113,7 @@ export default class CoveyTownController {
         if (this._listeners) {
           this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
-      });
+      }));
     }
   }
 
@@ -128,9 +129,9 @@ export default class CoveyTownController {
   /**
    * If the timer does not exist, begins repeated calls to updatePlayerSongs.
    */
-  public beginUpdatePlayerSongs(): void {
+  public async beginUpdatePlayerSongs(): Promise<void> {
     if (!this._intervalID) {
-      this._intervalID = setInterval(this.updatePlayerSongs.bind(this), 5000);
+      this._intervalID = setInterval(await this.updatePlayerSongs.bind(this), 5000);
     }
   }
 

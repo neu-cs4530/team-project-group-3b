@@ -143,7 +143,7 @@ export function townListHandler(): ResponseEnvelope<TownListResponse> {
   };
 }
 
-export function townCreateHandler(requestData: TownCreateRequest): ResponseEnvelope<TownCreateResponse> {
+export async function townCreateHandler(requestData: TownCreateRequest): Promise<ResponseEnvelope<TownCreateResponse>> {
   const townsStore = CoveyTownsStore.getInstance();
   if (requestData.friendlyName.length === 0) {
     return {
@@ -151,7 +151,7 @@ export function townCreateHandler(requestData: TownCreateRequest): ResponseEnvel
       message: 'FriendlyName must be specified',
     };
   }
-  const newTown = townsStore.createTown(requestData.friendlyName, requestData.isPubliclyListed);
+  const newTown = await townsStore.createTown(requestData.friendlyName, requestData.isPubliclyListed);
 
   SpotifyClient.addTownToClient(newTown.coveyTownID);
 
