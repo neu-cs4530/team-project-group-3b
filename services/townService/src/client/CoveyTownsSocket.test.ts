@@ -3,12 +3,14 @@ import CORS from 'cors';
 import http from 'http';
 import { nanoid } from 'nanoid';
 import { AddressInfo } from 'net';
+import { mockDeep } from 'jest-mock-extended';
 import * as TestUtils from './TestUtils';
 
 import { UserLocation } from '../CoveyTypes';
 import TownsServiceClient from './TownsServiceClient';
 import addTownRoutes from '../router/towns';
 import { SongData } from '../types/Player';
+import SpotifyClient from '../lib/SpotifyClient';
 
 jest.useFakeTimers();
 
@@ -139,12 +141,15 @@ describe('TownServiceApiSocket', () => {
     const joinData = await apiClient.joinTown({ coveyTownID: town.coveyTownID, userName: nanoid() });
     const joinData2 = await apiClient.joinTown({ coveyTownID: town.coveyTownID, userName: nanoid() });
     const joinData3 = await apiClient.joinTown({ coveyTownID: town.coveyTownID, userName: nanoid() });
+    const mockSpotifyClient = mockDeep<SpotifyClient>();
+    jest.spyOn(SpotifyClient, 'getInstance').mockReturnValue(mockSpotifyClient);
+    jest.spyOn(SpotifyClient, 'startUserPlayback').mockResolvedValue(true);
     const socketSender = TestUtils.createSocketClient(server, joinData.coveySessionToken, town.coveyTownID).socket;
-    const { playerSongRequested } = TestUtils.createSocketClient(server, joinData2.coveySessionToken, town.coveyTownID);
-    const { playerSongRequested: playerSongRequested2 } = TestUtils.createSocketClient(server, joinData3.coveySessionToken, town.coveyTownID);
-    const song: SongData = { displayTitle: 'string', uris: ['aa', 'bb'], progress: 1 };
+    const { playerSongUpdated } = TestUtils.createSocketClient(server, joinData2.coveySessionToken, town.coveyTownID);
+    const { playerSongUpdated: playerSongUpdated2 } = TestUtils.createSocketClient(server, joinData3.coveySessionToken, town.coveyTownID);
+    const song: SongData = { displayTitle: 'string', uris: ['aa', 'bb'], progress: 0 };
     socketSender.emit('playerSongRequest', song);
-    const [requestedPlayer, otherRequestedPlayer] = await Promise.all([playerSongRequested, playerSongRequested2]);
+    const [requestedPlayer, otherRequestedPlayer] = await Promise.all([playerSongUpdated, playerSongUpdated2]);
     expect(requestedPlayer._song).toMatchObject(song);
     expect(otherRequestedPlayer._song).toMatchObject(song);
   });
