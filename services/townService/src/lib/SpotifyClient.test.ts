@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import axios from 'axios';
-import { mock, mockDeep, mockReset } from 'jest-mock-extended';
+import { mockDeep } from 'jest-mock-extended';
 import Player, { PlaybackState, SongData } from '../types/Player';
 import CoveyTownController from './CoveyTownController';
 import SpotifyClient from './SpotifyClient';
