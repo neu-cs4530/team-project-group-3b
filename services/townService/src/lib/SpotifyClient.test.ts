@@ -186,6 +186,35 @@ describe('SpotifyClient', () => {
       expect(retrievedToken).toBeUndefined();
     });
   });
+  describe('town to client methods', () => {
+    const townName = `FriendlyNameTest1-${nanoid()}`;
+    const townController = new CoveyTownController(townName, false);
+    const player1 = new Player(nanoid());
+    const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
+    describe('addTownToClient', () => {
+      it('should successfully add the specified town to the SpotifyClient tracking map', async () => {
+        SpotifyClient.addTownToClient(townController.coveyTownID);
+        await townController.addPlayer(player1);
+        SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
+        const retrievedToken = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
+        // If the town did not exist in the map, the return value of a token request would be undefined.
+        expect(retrievedToken).not.toBeUndefined();
+      });
+    });
+    describe('removeTownFromClient', () => {
+      it('should successfully remove the specified town from the SC tracking map', async () => {
+        SpotifyClient.addTownToClient(townController.coveyTownID);
+        await townController.addPlayer(player1);
+        SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
+        const retrievedToken1 = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
+        expect(retrievedToken1).not.toBeUndefined();
+        SpotifyClient.removeTownFromClient(townController.coveyTownID);
+        const retrievedToken2 = SpotifyClient.getTokenForTownPlayer(townController.coveyTownID, player1);
+        // After removal, the token request will not be able to find the key corresponding to the town ID -> undefined
+        expect(retrievedToken2).toBeUndefined();
+      });
+    });
+  });
   /* describe('getCurrentPlayingSong', () => {
     it('should successfully retrieve current song data from the Spotify API', async () => {
 
