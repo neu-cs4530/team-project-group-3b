@@ -83,12 +83,21 @@ export default class CoveyTownController {
 
   private _capacity: number;
 
-  /** user for recurring function calls */
+  /** used for recurring function calls */
   private _intervalID: NodeJS.Timeout | undefined = undefined;
 
+  /**
+   * Updates the spotifySong of every player in the town.
+   * 
+   * Uses SpotifyClient to trigger calls to the SpotifyAPI in order to retreive
+   * data about what song is being listened to (if any), and whether the song is
+   * current playing or paused.
+   * 
+   * Dispatches onPlayerSongUpdated events after updating each player's song.
+   */
   updatePlayerSongs(): void {
     if (this.coveyTownID) {
-      this._players.forEach(async player => {
+      this._players.forEach(async (player) => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(this.coveyTownID, player);
         const playbackState = await SpotifyClient.getPlaybackState(this.coveyTownID, player);
 
@@ -103,7 +112,6 @@ export default class CoveyTownController {
         if (this._listeners) {
           this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
-        // console.log(currentPlayingSong?.displayTitle);
       });
     }
   }
@@ -114,6 +122,7 @@ export default class CoveyTownController {
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
     this._friendlyName = friendlyName;
+    this.updatePlayerSongs = this.updatePlayerSongs.bind(this);
   }
 
   /**
