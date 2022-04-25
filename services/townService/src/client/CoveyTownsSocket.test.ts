@@ -3,14 +3,12 @@ import CORS from 'cors';
 import http from 'http';
 import { nanoid } from 'nanoid';
 import { AddressInfo } from 'net';
-import { mock } from 'jest-mock-extended';
 import * as TestUtils from './TestUtils';
 
 import { UserLocation } from '../CoveyTypes';
 import TownsServiceClient from './TownsServiceClient';
 import addTownRoutes from '../router/towns';
 import { SongData } from '../types/Player';
-import CoveyTownController from '../lib/CoveyTownController';
 
 jest.useFakeTimers();
 
@@ -136,14 +134,18 @@ describe('TownServiceApiSocket', () => {
     await Promise.all([socketDisconnected, disconnectPromise2]);
   });
 
-  
   it('Dispatches song updates to all clients in the same town', async () => {
     const town = await createTownForTesting();
     const joinData = await apiClient.joinTown({ coveyTownID: town.coveyTownID, userName: nanoid() });
+    const joinData2 = await apiClient.joinTown({ coveyTownID: town.coveyTownID, userName: nanoid() });
+    const joinData3 = await apiClient.joinTown({ coveyTownID: town.coveyTownID, userName: nanoid() });
     const socketSender = TestUtils.createSocketClient(server, joinData.coveySessionToken, town.coveyTownID).socket;
-    const mockCoveyTownController = mock<CoveyTownController>();
-    const song: SongData = { displayTitle: 'string', uris: [], progress: 1 };
+    const { playerSongRequested } = TestUtils.createSocketClient(server, joinData2.coveySessionToken, town.coveyTownID);
+    const { playerSongRequested: playerSongRequested2 } = TestUtils.createSocketClient(server, joinData3.coveySessionToken, town.coveyTownID);
+    const song: SongData = { displayTitle: 'string', uris: ['aa', 'bb'], progress: 1 };
     socketSender.emit('playerSongRequest', song);
-    expect(mockCoveyTownController.changePlayerSong).toHaveBeenCalled();
+    const [requestedPlayer, otherRequestedPlayer] = await Promise.all([playerSongRequested, playerSongRequested2]);
+    expect(requestedPlayer._song).toMatchObject(song);
+    expect(otherRequestedPlayer._song).toMatchObject(song);
   });
 });
