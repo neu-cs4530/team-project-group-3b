@@ -85,7 +85,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.post('/towns', express.json(), async (req, res) => {
     try {
-      const result = townCreateHandler(req.body);
+      const result = await townCreateHandler(req.body);
       res.status(StatusCodes.OK)
         .json(result);
     } catch (err) {

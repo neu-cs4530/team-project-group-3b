@@ -144,7 +144,7 @@ describe('CoveyTownController', () => {
     let session: PlayerSession;
     beforeEach(async () => {
       const townName = `connectPlayerSocket tests ${nanoid()}`;
-      testingTown = CoveyTownsStore.getInstance().createTown(townName, false);
+      testingTown = await CoveyTownsStore.getInstance().createTown(townName, false);
       mockReset(mockSocket);
       player = new Player('test player');
       session = await testingTown.addPlayer(player);
@@ -341,15 +341,14 @@ describe('CoveyTownController', () => {
     it('should call getCurrentPlayingSong the proper number of times', async () => {
       const spiedOnMethod = jest.spyOn(SpotifyClient, 'getCurrentPlayingSong').mockResolvedValue(undefined);
 
-      testingTown.updatePlayerSongs();
+      await testingTown.updatePlayerSongs();
 
       expect(spiedOnMethod).toBeCalledTimes(2);
 
-      testingTown.updatePlayerSongs();
+      await testingTown.updatePlayerSongs();
 
       expect(spiedOnMethod).toBeCalledTimes(4);
     });
-    /*
     it('should call getPlaybackState the proper number of times', async () => {
       const spiedOnMethod = jest.spyOn(SpotifyClient, 'getPlaybackState');// .mockResolvedValue({ isPlaying: true });
 
@@ -361,6 +360,5 @@ describe('CoveyTownController', () => {
 
       expect(spiedOnMethod).toBeCalledTimes(4);
     });
-    */
   });
 });

@@ -56,10 +56,10 @@ export default class CoveyTownsStore {
    * @param isPubliclyListed 
    * @returns the new town controller
    */
-  createTown(friendlyName: string, isPubliclyListed: boolean): CoveyTownController {
+  async createTown(friendlyName: string, isPubliclyListed: boolean): Promise<CoveyTownController> {
     const newTown = new CoveyTownController(friendlyName, isPubliclyListed);
     this._towns.push(newTown);
-    newTown.beginUpdatePlayerSongs();
+    await newTown.beginUpdatePlayerSongs();
     return newTown;
   }
 
