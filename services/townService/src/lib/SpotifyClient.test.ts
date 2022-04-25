@@ -1,15 +1,8 @@
 import { nanoid } from 'nanoid';
 import axios from 'axios';
 import { mock, mockDeep, mockReset } from 'jest-mock-extended';
-import { Socket } from 'socket.io';
-import Player from '../types/Player';
+import Player, { SongData } from '../types/Player';
 import CoveyTownController from './CoveyTownController';
-import CoveyTownListener from '../types/CoveyTownListener';
-import { UserLocation } from '../CoveyTypes';
-import PlayerSession from '../types/PlayerSession';
-import { townSubscriptionHandler } from '../requestHandlers/CoveyTownRequestHandlers';
-import CoveyTownsStore from './CoveyTownsStore';
-import * as TestUtils from '../client/TestUtils';
 import SpotifyClient from './SpotifyClient';
 import TwilioVideo from './TwilioVideo';
 
@@ -23,7 +16,7 @@ jest.spyOn(SpotifyClient, 'getInstance').mockReturnValue(mockSpotifyClient);
 
 jest.mock('axios');
 
-const getCPTData = {
+const getCPSData = { data: {
   'timestamp': 1649900555682,
   'context': {
     'external_urls': {
@@ -118,7 +111,7 @@ const getCPTData = {
     },
   },
   'is_playing': true,
-};
+} };
 
 describe('SpotifyClient', () => {
   beforeEach(() => {
@@ -215,21 +208,22 @@ describe('SpotifyClient', () => {
       });
     });
   });
-  /* describe('getCurrentPlayingSong', () => {
+  describe('getCurrentPlayingSong', () => {
     it('should successfully retrieve current song data from the Spotify API', async () => {
-
-      jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getCPTData));
+      jest.spyOn(axios, 'get').mockImplementationOnce(() => Promise.resolve(getCPSData));
       const testAuthToken = '{"access_token":"test_token", "expiry":3600}';
-
       const player1 = new Player(nanoid());
       const townName = `FriendlyNameTest1-${nanoid()}`;
       const townController = new CoveyTownController(townName, false);
       await townController.addPlayer(player1);
       SpotifyClient.addTownToClient(townController.coveyTownID);
       SpotifyClient.addTownPlayerToClient(townController.coveyTownID, player1, testAuthToken);
-
-      await expect(SpotifyClient.getCurrentPlayingSong(townController.coveyTownID, player1)).resolves.toEqual(getCPTData);
+      const sampleSongData : SongData = { displayTitle: 'Bitch Where by Chief Keef',
+        uris: ['spotify:track:082PtKxlyQMemAnYZLSJMP'],
+        progress: 3753,
+      };
+      await expect(SpotifyClient.getCurrentPlayingSong(townController.coveyTownID, player1)).resolves.toEqual(sampleSongData);
     });
-  }); */
+  });
 });
 
