@@ -88,7 +88,7 @@ export default class CoveyTownController {
 
   async updatePlayerSongs(): Promise<void> {
     if (this.coveyTownID) {
-      this._players.forEach(async player => {
+      await Promise.all(this._players.map(async (player) => {
         const currentPlayingSong = await SpotifyClient.getCurrentPlayingSong(this.coveyTownID, player);
         const playbackState = await SpotifyClient.getPlaybackState(this.coveyTownID, player);
 
@@ -104,7 +104,7 @@ export default class CoveyTownController {
           this._listeners.forEach(listener => listener.onPlayerSongUpdated(player));
         }
         // console.log(currentPlayingSong?.displayTitle);
-      });
+      }));
     }
   }
 
