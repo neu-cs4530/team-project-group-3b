@@ -7,9 +7,10 @@ import http from 'http';
 import { nanoid } from 'nanoid';
 import { UserLocation } from '../CoveyTypes';
 import { BoundingBox, ServerConversationArea } from './TownsServiceClient';
+import { SongData } from '../types/Player';
 
 export type RemoteServerPlayer = {
-  location: UserLocation, _userName: string, _id: string
+  location: UserLocation, _userName: string, _id: string, _song: SongData,
 };
 const createdSocketClients: Socket[] = [];
 
@@ -47,6 +48,8 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
   playerMoved: Promise<RemoteServerPlayer>,
   newPlayerJoined: Promise<RemoteServerPlayer>,
   playerDisconnected: Promise<RemoteServerPlayer>,
+  playerSongUpdated: Promise<RemoteServerPlayer>,
+  playerSongRequested: Promise<RemoteServerPlayer>,
 } {
   const address = server.address() as AddressInfo;
   const socket = io(`http://localhost:${address.port}`, {
@@ -78,6 +81,16 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
       resolve(player);
     });
   });
+  const playerSongUpdatedPromise = new Promise<RemoteServerPlayer>((resolve) => {
+    socket.on('playerSongUpdated', (player: RemoteServerPlayer) => {
+      resolve(player);
+    });
+  });
+  const playerSongRequestPromise = new Promise<RemoteServerPlayer>((resolve) => {
+    socket.on('playerSongRequest', (player: RemoteServerPlayer) => {
+      resolve(player);
+    });
+  });
   createdSocketClients.push(socket);
   return {
     socket,
@@ -86,6 +99,8 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
     playerMoved: playerMovedPromise,
     newPlayerJoined: newPlayerPromise,
     playerDisconnected: playerDisconnectPromise,
+    playerSongUpdated: playerSongUpdatedPromise,
+    playerSongRequested: playerSongRequestPromise,
   };
 }
 export function setSessionTokenAndTownID(coveyTownID: string, sessionToken: string, socket: ServerSocket):void {
