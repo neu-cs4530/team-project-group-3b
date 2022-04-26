@@ -81,7 +81,6 @@ describe('CoveyTownController', () => {
       const player = new Player('test player');
       await testingTown.addPlayer(player);
       mockListeners.forEach(listener => expect(listener.onPlayerJoined).toBeCalledWith(player));
-
     });
     it('should notify added listeners that the town is destroyed when disconnectAllPlayers is called', async () => {
       const player = new Player('test player');
@@ -90,7 +89,47 @@ describe('CoveyTownController', () => {
       mockListeners.forEach(listener => testingTown.addTownListener(listener));
       testingTown.disconnectAllPlayers();
       mockListeners.forEach(listener => expect(listener.onTownDestroyed).toBeCalled());
+    });
+    it('should notify added listeners of player song updates when updatePlayerSongs is called', async () => {
+      const player = new Player('test player');
+      await testingTown.addPlayer(player);
 
+      mockListeners.forEach(listener => testingTown.addTownListener(listener));
+      await testingTown.updatePlayerSongs();
+      mockListeners.forEach(listener => expect(listener.onPlayerSongUpdated).toBeCalledWith(player));
+    });
+    it('should notify added listeners of player song updates when changePlayerSong is called', async () => {
+      const player = new Player('test player');
+      await testingTown.addPlayer(player);
+
+      const testSong: SongData = {
+        displayTitle: 'Testing Song by Tests',
+        uris: [ 'spotify:track:t35t1ng123ur1' ],
+        progress: 2000,
+      };
+
+      jest.spyOn(SpotifyClient, 'startUserPlayback').mockResolvedValueOnce(true);
+
+      mockListeners.forEach(listener => testingTown.addTownListener(listener));
+      await testingTown.changePlayerSong(player, testSong);
+      mockListeners.forEach(listener => expect(listener.onPlayerSongUpdated).toBeCalledWith(player));
+    });
+    it('should not notify added listeners of player song updates when changePlayerSong is called'
+    + ' and triggers an unsuccessful Spotify API call', async () => {
+      const player = new Player('test player');
+      await testingTown.addPlayer(player);
+
+      const testSong: SongData = {
+        displayTitle: 'Testing Song by Tests',
+        uris: [ 'spotify:track:t35t1ng123ur1' ],
+        progress: 2000,
+      };
+
+      jest.spyOn(SpotifyClient, 'startUserPlayback').mockResolvedValueOnce(false);
+
+      mockListeners.forEach(listener => testingTown.addTownListener(listener));
+      await testingTown.changePlayerSong(player, testSong);
+      mockListeners.forEach(listener => expect(listener.onPlayerSongUpdated).not.toBeCalled());
     });
     it('should not notify removed listeners of player movement when updatePlayerLocation is called', async () => {
       const player = new Player('test player');
@@ -112,7 +151,6 @@ describe('CoveyTownController', () => {
       testingTown.removeTownListener(listenerRemoved);
       testingTown.destroySession(session);
       expect(listenerRemoved.onPlayerDisconnected).not.toBeCalled();
-
     });
     it('should not notify removed listeners of new players when addPlayer is called', async () => {
       const player = new Player('test player');
@@ -124,7 +162,6 @@ describe('CoveyTownController', () => {
       testingTown.destroySession(session);
       expect(listenerRemoved.onPlayerJoined).not.toBeCalled();
     });
-
     it('should not notify removed listeners that the town is destroyed when disconnectAllPlayers is called', async () => {
       const player = new Player('test player');
       await testingTown.addPlayer(player);
@@ -134,7 +171,34 @@ describe('CoveyTownController', () => {
       testingTown.removeTownListener(listenerRemoved);
       testingTown.disconnectAllPlayers();
       expect(listenerRemoved.onTownDestroyed).not.toBeCalled();
+    });
+    it('should not notify removed listeners of player song updates when updatePlayerSongs is called', async () => {
+      const player = new Player('test player');
+      await testingTown.addPlayer(player);
 
+      mockListeners.forEach(listener => testingTown.addTownListener(listener));
+      const listenerRemoved = mockListeners[1];
+      testingTown.removeTownListener(listenerRemoved);
+      await testingTown.updatePlayerSongs();
+      expect(listenerRemoved.onPlayerSongUpdated).not.toBeCalled();
+    });
+    it('should not notify removed listeners of player song updates when changePlayerSong is called', async () => {
+      const player = new Player('test player');
+      await testingTown.addPlayer(player);
+
+      const testSong: SongData = {
+        displayTitle: 'Testing Song by Tests',
+        uris: [ 'spotify:track:t35t1ng123ur1' ],
+        progress: 2000,
+      };
+
+      jest.spyOn(SpotifyClient, 'startUserPlayback').mockResolvedValueOnce(true);
+
+      mockListeners.forEach(listener => testingTown.addTownListener(listener));
+      const listenerRemoved = mockListeners[1];
+      testingTown.removeTownListener(listenerRemoved);
+      await testingTown.changePlayerSong(player, testSong);
+      expect(listenerRemoved.onPlayerSongUpdated).not.toBeCalled();
     });
   });
   describe('townSubscriptionHandler', () => {
@@ -350,14 +414,16 @@ describe('CoveyTownController', () => {
 
       await testingTown.updatePlayerSongs();
 
+      // called once per player
       expect(spiedOnMethod).toBeCalledTimes(2);
 
       await testingTown.updatePlayerSongs();
 
+      // called once per player per updatePlayerSongs call
       expect(spiedOnMethod).toBeCalledTimes(4);
     });
     it('should call getPlaybackState the proper number of times', async () => {
-      const spiedOnMethod = jest.spyOn(SpotifyClient, 'getPlaybackState');// .mockResolvedValue({ isPlaying: true });
+      const spiedOnMethod = jest.spyOn(SpotifyClient, 'getPlaybackState');
 
       await testingTown.updatePlayerSongs();
 
@@ -377,7 +443,6 @@ describe('CoveyTownController', () => {
       await testingTown.updatePlayerSongs();
 
       expect(player1.spotifySong).toMatchObject(testSong);
-
       expect(player2.spotifySong).toMatchObject(testSong);
     });
     it('should set a player\'s song to undefined if no song is currently playing', async () => {
@@ -403,6 +468,61 @@ describe('CoveyTownController', () => {
 
       expect(player1.spotifySong).toBeUndefined();
       expect(player2.spotifySong).toBeUndefined();
+    });
+  });
+  describe('changePlayerSong', () => {
+    let testingTown: CoveyTownController;
+    let player: Player;
+    let testSong: SongData;
+    let testSongFromStart: SongData;
+    beforeEach(async () => {
+      const townName = `changePlayerSong test town ${nanoid()}`;
+      testingTown = new CoveyTownController(townName, false);
+      player = new Player('test player');
+      testSong = {
+        displayTitle: 'Testing Song by Tests',
+        uris: [ 'spotify:track:t35t1ng123ur1' ],
+        progress: 2000,
+      };
+      testSongFromStart = {
+        displayTitle: 'Testing Song by Tests',
+        uris: [ 'spotify:track:t35t1ng123ur1' ],
+        progress: 0,
+      };
+
+      await testingTown.addPlayer(player);
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('calls SpotifyClient.startUserPlayback with the proper arguments', async () => {
+      const spiedOnMethod = jest.spyOn(SpotifyClient, 'startUserPlayback');
+
+      expect(spiedOnMethod).not.toBeCalled();
+
+      await testingTown.changePlayerSong(player, testSong);
+
+      expect(spiedOnMethod).toBeCalledTimes(1);
+      expect(spiedOnMethod).toBeCalledWith(testingTown.coveyTownID, player, testSongFromStart);
+    });
+    it('sets the spotifySong property of a player to the desired song', async () => {
+      jest.spyOn(SpotifyClient, 'startUserPlayback').mockResolvedValueOnce(true);
+
+      expect(player.spotifySong).toBeUndefined();
+
+      await testingTown.changePlayerSong(player, testSong);
+
+      expect(player.spotifySong).toMatchObject(testSongFromStart);
+    });
+    it('does not change the spotifySong property of a player if it triggers an'
+    + ' unsuccessful Spotify API call', async () => {
+      jest.spyOn(SpotifyClient, 'startUserPlayback').mockResolvedValueOnce(false);
+
+      expect(player.spotifySong).toBeUndefined();
+
+      await testingTown.changePlayerSong(player, testSong);
+
+      expect(player.spotifySong).toBeUndefined();
     });
   });
 });

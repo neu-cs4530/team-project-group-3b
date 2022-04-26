@@ -145,7 +145,6 @@ export default class SpotifyClient {
     const playerToToken = SpotifyClient._townsToPlayerMaps.get(coveyTownID);
 
     playerToToken?.delete(player);
-    // console.log(SpotifyClient._townsToPlayerMaps);
   }
 
   /**
