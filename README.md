@@ -39,7 +39,20 @@ The backend will automatically restart if you change any of the files in the `se
 
 ### Configuring the frontend
 
-Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWNS_SERVICE_URL=http://localhost:8081` (if you deploy the towns service to another location, put that location here instead)
+When configuring the frontend, you’ll want a Spotify developer app set up. In order to do so, following these steps:
+1. Go to https://developer.spotify.com/dashboard/ and login with your Spotify account
+2. Create a new app with an appropriate name and description.
+3. If building for a development server, add all users that will be used to test the service (name and email are required). Otherwise, request a quota extension request.
+4. Click “Edit Settings” on the dashboard and add the frontend location followed by “/callback” (probably “http://localhost:3000/callback”) to the list of redirect URIs.
+
+Now, create a .env file in the frontend directory with the following lines:
+
+| Config Value                     | Description                                                                                                 |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `REACT_APP_TOWNS_SERVICE_URL`    | http://localhost:8081 (if you deploy the towns service to another location, put that location here instead) |
+| `REACT_APP_SPOTIFY_CLIENT_ID`    | (put the client id found on the Spotify dashboard here)                                                     |
+| `REACT_APP_SPOTIFY_REDIRECT_URI` | http://localhost:3000/callback (this has to be the same as the redirect uri put into the Spotify dashboard) |
+| `REACT_APP_BASE_URL`             | localhost:3000 (or wherever the frontend location is)                                                       |
 
 ### Running the frontend
 
